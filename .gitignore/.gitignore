@@ -190,6 +190,7 @@ $RECYCLE.BIN/
 
 # Visual Studio temp something
 .vs/
+.packages/
 
 # dotnet stuff
 project.lock.json
@@ -207,7 +208,6 @@ project.lock.json
 # Output folder used by Webpack or other FE stuff
 **/node_modules/*
 **/wwwroot/*
-**.src/packages/*
 
 # SpecFlow specific
 *.feature.cs
