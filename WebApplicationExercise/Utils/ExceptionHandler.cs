@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data;
 using System.Data.Entity.Core;
+using System.Data.Entity.Infrastructure;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -40,9 +42,18 @@ namespace WebApplicationExercise.Utils
                 {
                     exceptionLogInfo.Type = context.Exception as NullReferenceException != null ?
                         nameof(NullReferenceException) :
-                        context.Exception as NullReferenceException != null ?
-                            nameof(OperationCanceledException) :
+                        context.Exception as InvalidOperationException != null ?
+                            nameof(InvalidOperationException) :
                             nameof(SystemException);
+
+                    context.Response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                }
+                else
+                if (context.Exception is DataException)
+                {
+                    exceptionLogInfo.Type = context.Exception as DbUpdateException != null ?
+                        nameof(DbUpdateException) :
+                        nameof(DataException);
 
                     context.Response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
                 }

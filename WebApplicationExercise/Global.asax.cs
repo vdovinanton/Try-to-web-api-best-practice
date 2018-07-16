@@ -19,7 +19,7 @@ namespace WebApplicationExercise
 
             GlobalConfiguration.Configuration.Filters.Add(new ExceptionHandler());
             GlobalConfiguration.Configuration.Filters.Add(new CustomActionAttribute());
-
+            
             Logger.Instance.Information("Application started");
         }
     }

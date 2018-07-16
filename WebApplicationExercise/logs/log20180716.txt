@@ -1,6 +1,11 @@
-2018-07-16 16:33:03.867 +03:00 [INF] Application started
-2018-07-16 16:33:05.443 +03:00 [INF] Executing request: POST  /api/orders; for GUID [a6ead26e-aead-4521-a636-b2af13554e99]
-2018-07-16 16:33:07.737 +03:00 [ERR] POST /api/orders - SystemException - Didn't finish request - Time taken: 1452.6979ms; for GUID [a6ead26e-aead-4521-a636-b2af13554e99] 
-2018-07-16 16:33:33.153 +03:00 [INF] Application started
-2018-07-16 16:33:36.561 +03:00 [INF] Executing request: POST  /api/orders; for GUID [e4420836-6665-49d4-be92-a853d56328d1]
-2018-07-16 16:33:38.238 +03:00 [ERR] POST /api/orders - ArgumentNullException - Value cannot be null.  Parameter name: Id can't be empty 
+2018-07-16 19:13:31.551 +03:00 [INF] Application started
+2018-07-16 19:13:56.622 +03:00 [INF] Executing request: DELETE  /api/v1/orders; for GUID [a75077df-aabd-4710-9ab2-a774b998fee9]
+2018-07-16 19:13:59.927 +03:00 [ERR] DELETE /api/v1/orders - SystemException - An error occurred while saving entities that do not expose foreign key properties for their relationships. The EntityEntries property will return null because a single entity cannot be identified as the source of the exception. Handling of exceptions while saving can be made easier by exposing foreign key properties in your entity types. See the InnerException for details. 
+2018-07-16 19:14:43.046 +03:00 [INF] Executing request: GET  /api/v1/orders; for GUID [e7a10421-bcf2-4c07-82a1-d87bcc373ff9]
+2018-07-16 19:14:43.047 +03:00 [INF] Get all orders
+2018-07-16 19:14:43.061 +03:00 [INF] Executed request GET /api/v1/orders  - Time taken: 14.3075ms; for GUID [e7a10421-bcf2-4c07-82a1-d87bcc373ff9]
+2018-07-16 19:22:27.955 +03:00 [INF] Application started
+2018-07-16 19:22:50.079 +03:00 [INF] Executing request: GET  /api/v1/orders; for GUID [3ab5c26f-631f-450c-92b4-a0de939322bf]
+2018-07-16 19:22:50.987 +03:00 [INF] Get all orders [14]
+2018-07-16 19:22:51.019 +03:00 [INF] Filtered orders by default customer [14/14]
+2018-07-16 19:22:51.023 +03:00 [INF] Executed request GET /api/v1/orders  - Time taken: 943.7224ms; for GUID [3ab5c26f-631f-450c-92b4-a0de939322bf]

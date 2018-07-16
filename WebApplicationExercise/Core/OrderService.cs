@@ -49,6 +49,9 @@ namespace WebApplicationExercise.Core
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="order"/> Id is null</exception>
         void UpdateOrder(Order order);
+
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="order"/> Id is null</exception>
+        void Remove(Order order);
     }
     #endregion
     public class OrderService: IOrderService
@@ -65,8 +68,9 @@ namespace WebApplicationExercise.Core
 
         public IEnumerable<Order> GetAll()
         {
-            Logger.Instance.Information("Get all orders");
-            return _db.Orders.Include(o => o.Products);
+            var result = _db.Orders.Include(o => o.Products);
+            Logger.Instance.Information($"Get all orders [{result.Count()}]");
+            return result;
         }
 
         public Order GetBy(Guid orderId)
@@ -80,12 +84,16 @@ namespace WebApplicationExercise.Core
             if (string.IsNullOrWhiteSpace(customerName))
                 throw new ArgumentNullException(nameof(customerName) + "can't be empty or null");
 
-            return orders.Where(o => o.Customer == customerName);
+            var result = orders.Where(o => o.Customer == customerName);
+            Logger.Instance.Information($"Filtered orders by {customerName} customer [{orders.Count()}/{result.Count()}]");
+            return result;
         }
 
         public IEnumerable<Order> FilterByCustomer(IEnumerable<Order> orders)
         {
-            return orders.Where(o => _customerService.IsCustomerVisible(o.Customer));
+            var result = orders.Where(o => _customerService.IsCustomerVisible(o.Customer));
+            Logger.Instance.Information($"Filtered orders by default customer [{orders.Count()}/{result.Count()}]");
+            return result;
         }
 
         public IEnumerable<Order> FilterByDate(IEnumerable<Order> orders, DateTime from, DateTime to)
@@ -93,7 +101,9 @@ namespace WebApplicationExercise.Core
             if (DateTime.Compare(from, to) >= 0)
                 throw new ArgumentOutOfRangeException($"{nameof(to)} date can't be earlier than {nameof(from)}");
 
-            return orders.Where(o => o.CreatedDate >= from && o.CreatedDate < to);
+            var result = orders.Where(o => o.CreatedDate >= from && o.CreatedDate < to);
+            Logger.Instance.Information($"Filtered orders by date [{orders.Count()}/{result.Count()}]");
+            return result;
         }
 
         public void UpdateOrder(Order order)
@@ -109,14 +119,28 @@ namespace WebApplicationExercise.Core
             return UpdateOrCreate(order);
         }
 
+        public void Remove(Order order)
+        {
+            if (!Equals(order.Id, Guid.Empty))
+            {
+                _db.Entry(order).State = EntityState.Deleted;
+                _db.SaveChanges();
+                Logger.Instance.Information($"Remove order Id - {order.Id}");
+            }
+            else
+            {
+                throw new ArgumentNullException($"{nameof(order.Id)} can't be empty");
+            }
+        }
+
         private Order UpdateOrCreate(Order order)
         {
             var entityState = EntityState.Unchanged;
             using (_db)
             {
-                entityState = Equals(order.Id, Guid.Empty) ?
-                    EntityState.Added :
-                    EntityState.Modified;
+                entityState = _db.Orders.Any(_ => _.Id == order.Id) ?
+                    EntityState.Modified :
+                    EntityState.Added;
                 
                 _db.Entry(order).State = entityState;
                 _db.SaveChanges();

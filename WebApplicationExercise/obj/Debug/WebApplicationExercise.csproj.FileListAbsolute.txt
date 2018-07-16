@@ -309,3 +309,5 @@ C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\bin\Micros
 C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\obj\Debug\WebApplicationExercise.csprojResolveAssemblyReference.cache
 C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\obj\Debug\WebApplicationExercise.dll
 C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\obj\Debug\WebApplicationExercise.pdb
+C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\bin\Swashbuckle.Core.dll
+C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\bin\WebActivatorEx.dll
