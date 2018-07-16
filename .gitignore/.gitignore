@@ -113,6 +113,7 @@ csx
 
 # Windows Store app package directory
 AppPackages/
+packages/
 
 # Others
 *.Cache
