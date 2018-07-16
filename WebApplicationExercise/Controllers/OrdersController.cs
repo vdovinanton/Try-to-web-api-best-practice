@@ -1,62 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
 using WebApplicationExercise.Core;
 using WebApplicationExercise.Models;
-using System.Data.Entity;
+using WebApplicationExercise.Utils;
 
 namespace WebApplicationExercise.Controllers
 {
     [RoutePrefix("api/orders")]
     public class OrdersController : ApiController
     {
-        private MainDataContext _dataContext = new MainDataContext();
-        private CustomerManager _customerManager = new CustomerManager();
+        private readonly IOrderService _orderService;
+        public OrdersController()
+        {
+            // or via IoC
+            _orderService = new OrderService();
+        }
+        
+        //todo: add async
 
         [HttpGet]
-        [Route("getOrder")]
         public Order GetOrder(Guid orderId)
         {
-            return _dataContext.Orders.Include(o => o.Products).Single(o => o.Id == orderId);
-        }
-
-        [HttpGet]
-        [Route("getOrders")]
-        public IEnumerable<Order> GetOrders(DateTime? from = null, DateTime? to = null, string customerName = null)
-        {
-            IEnumerable<Order> orders = _dataContext.Orders.Include(o => o.Products);
-
-            if (from != null && to != null)
-            {
-                orders = FilterByDate(orders, from.Value, to.Value);
-            }
-
-            if (customerName != null)
-            {
-                orders = FilterByCustomer(orders, customerName);
-            }
-
-            return orders.Where(o => _customerManager.IsCustomerVisible(o.Customer));
+            return _orderService.GetBy(orderId);
         }
 
         [HttpPost]
-        [Route("saveOrder")]
-        public void SaveOrder([FromBody]Order order)
+        public void UpdateOrder([FromBody]Order order)
         {
-            _dataContext.Orders.Add(order);
-            _dataContext.SaveChanges();
+            _orderService.UpdateOrder(order);
         }
 
-        private IEnumerable<Order> FilterByCustomer(IEnumerable<Order> orders, string customerName)
+        [HttpPut]
+        [ExceptionHandler]
+        public Order CreateOrder([FromBody]Order order)
         {
-            return orders.Where(o => o.Customer == customerName);
+            return _orderService.CreateOrder(order);
         }
 
-        private IEnumerable<Order> FilterByDate(IEnumerable<Order> orders, DateTime from, DateTime to)
+        [HttpGet]
+        public IEnumerable<Order> GetOrders(DateTime? from = null, DateTime? to = null, string customerName = null)
         {
-            return orders.Where(o => o.CreatedDate >= from && o.CreatedDate < to);
+            var orders = _orderService.GetAll();
+
+            if (from != null && to != null)
+                orders = _orderService.FilterByDate(orders, from.Value, to.Value);
+
+            if (customerName != null)
+                orders = _orderService.FilterByCustomer(orders, customerName);
+
+            return _orderService.FilterByCustomer(orders);
         }
     }
 }

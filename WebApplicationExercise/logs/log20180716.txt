@@ -1,0 +1,6 @@
+2018-07-16 16:33:03.867 +03:00 [INF] Application started
+2018-07-16 16:33:05.443 +03:00 [INF] Executing request: POST  /api/orders; for GUID [a6ead26e-aead-4521-a636-b2af13554e99]
+2018-07-16 16:33:07.737 +03:00 [ERR] POST /api/orders - SystemException - Didn't finish request - Time taken: 1452.6979ms; for GUID [a6ead26e-aead-4521-a636-b2af13554e99] 
+2018-07-16 16:33:33.153 +03:00 [INF] Application started
+2018-07-16 16:33:36.561 +03:00 [INF] Executing request: POST  /api/orders; for GUID [e4420836-6665-49d4-be92-a853d56328d1]
+2018-07-16 16:33:38.238 +03:00 [ERR] POST /api/orders - ArgumentNullException - Value cannot be null.  Parameter name: Id can't be empty 

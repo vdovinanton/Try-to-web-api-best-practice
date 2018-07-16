@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using WebApplicationExercise.Core;
+using WebApplicationExercise.Utils;
 
 namespace WebApplicationExercise
 {
@@ -18,6 +16,11 @@ namespace WebApplicationExercise
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            GlobalConfiguration.Configuration.Filters.Add(new ExceptionHandler());
+            GlobalConfiguration.Configuration.Filters.Add(new CustomActionAttribute());
+
+            Logger.Instance.Information("Application started");
         }
     }
 }
