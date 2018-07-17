@@ -51,7 +51,7 @@ namespace WebApplicationExercise.Core
         void UpdateOrder(Order order);
 
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="order"/> Id is null</exception>
-        void Remove(Order order);
+        void Remove(Guid orderId);
     }
     #endregion
     public class OrderService: IOrderService
@@ -76,7 +76,7 @@ namespace WebApplicationExercise.Core
         public Order GetBy(Guid orderId)
         {
             Logger.Instance.Information($"Get order by Id - {orderId}");
-            return _db.Orders.Include(o => o.Products).Single(o => o.Id == orderId);
+            return _db.Orders.Include(o => o.Products).FirstOrDefault(o => o.Id == orderId);
         }
 
         public IEnumerable<Order> FilterByCustomer(IEnumerable<Order> orders, string customerName)
@@ -119,39 +119,44 @@ namespace WebApplicationExercise.Core
             return UpdateOrCreate(order);
         }
 
-        public void Remove(Order order)
+        public void Remove(Guid orderId)
         {
-            if (!Equals(order.Id, Guid.Empty))
+            if (!Equals(orderId, Guid.Empty))
             {
+                var order = GetBy(orderId);
                 _db.Entry(order).State = EntityState.Deleted;
                 _db.SaveChanges();
                 Logger.Instance.Information($"Remove order Id - {order.Id}");
             }
             else
             {
-                throw new ArgumentNullException($"{nameof(order.Id)} can't be empty");
+                throw new ArgumentNullException($"{nameof(orderId)} can't be empty");
             }
         }
 
         private Order UpdateOrCreate(Order order)
         {
-            var entityState = EntityState.Unchanged;
+            var entityState = EntityState.Added;
+            var logTemplate = "Added ";
             using (_db)
             {
                 entityState = _db.Orders.Any(_ => _.Id == order.Id) ?
                     EntityState.Modified :
                     EntityState.Added;
-                
+
+                if (entityState == EntityState.Modified)
+                {
+                    logTemplate = "Modified ";
+                    foreach(var product in order.Products)
+                        _db.Entry(product).State = EntityState.Modified;
+                }
+
                 _db.Entry(order).State = entityState;
                 _db.SaveChanges();
+
+                var productCount = order.Products == null ? 0 : order.Products.Count;
+                Logger.Instance.Information(logTemplate + $"orderId - {order.Id} with {productCount} products");
             }
-
-            var logTemplate = entityState == EntityState.Added ?
-                    $"Added" :
-                    $"Modified ";
-
-            Logger.Instance.Information(logTemplate + $"orderId - {order.Id}");
-
             return order;
         }
     }

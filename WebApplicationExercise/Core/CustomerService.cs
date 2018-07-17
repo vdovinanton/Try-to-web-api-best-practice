@@ -7,7 +7,6 @@ namespace WebApplicationExercise.Core
         bool IsCustomerVisible(string customerName);
     }
 
-    //move to attribute
     public class CustomerService: ICustomerService
     {
         public bool IsCustomerVisible(string customerName)

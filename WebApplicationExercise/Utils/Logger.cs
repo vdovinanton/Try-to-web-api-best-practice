@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using NLog;
+using Serilog;
 using System;
 using WebApplicationExercise.Models;
 
@@ -11,24 +12,25 @@ namespace WebApplicationExercise.Core
         public static Logger Instance => _instance.Value;
         #endregion
 
-        private readonly ILogger _logger;
+        private readonly NLog.Logger _logger;
+
 
         private Logger()
         {
-            //todo: move to settings
-            var startupPath = AppDomain.CurrentDomain.BaseDirectory;
-            var logDirectory = "logs";
+            var config = new NLog.Config.LoggingConfiguration();
 
-            var logFilesPath = $"{startupPath}{logDirectory}\\";
+            var logfile = new NLog.Targets.FileTarget("logfile") { FileName = "log/file.txt" };
 
-            _logger = new LoggerConfiguration()
-                .WriteTo.File(logFilesPath + "log.txt", rollingInterval: RollingInterval.Day)
-                .CreateLogger();
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
+
+            LogManager.Configuration = config;
+
+            _logger = LogManager.GetCurrentClassLogger();
         }
 
         public void Information(string messageTemplate)
         {
-            _logger.Information(messageTemplate);
+            _logger.Info(messageTemplate);
         }
 
         public void Error(ExceptionLog exception, bool isCritical = false)

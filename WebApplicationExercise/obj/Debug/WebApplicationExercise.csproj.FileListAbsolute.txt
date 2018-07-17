@@ -311,3 +311,6 @@ C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\obj\Debug\
 C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\obj\Debug\WebApplicationExercise.pdb
 C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\bin\Swashbuckle.Core.dll
 C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\bin\WebActivatorEx.dll
+C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\bin\NLog.config
+C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\bin\NLog.dll
+C:\_workflow\_pet\Try-to-web-api-best-practice\WebApplicationExercise\bin\NLog.xml

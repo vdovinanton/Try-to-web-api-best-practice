@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using WebApplicationExercise.Core;
 using WebApplicationExercise.Models;
@@ -16,32 +17,33 @@ namespace WebApplicationExercise.Controllers
             _orderService = new OrderService();
         }
         
-        //todo: add async
-
         [HttpGet]
         [Route("{orderId}")]
-        public Order GetOrder(Guid orderId)
+        public HttpResponseMessage GetOrder(Guid orderId)
         {
-            return _orderService.GetBy(orderId);
+            var result = _orderService.GetBy(orderId);
+            var statusCode = result != null ? HttpStatusCode.OK : HttpStatusCode.NotFound;
+            return Request.CreateResponse(statusCode, result);
         }
 
         [HttpPost]
         [Route]
-        public void UpdateOrder([FromBody]Order order)
+        public HttpResponseMessage UpdateOrder([FromBody]Order order)
         {
             _orderService.UpdateOrder(order);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpPut]
         [Route]
-        public Order CreateOrder([FromBody]Order order)
+        public HttpResponseMessage CreateOrder([FromBody]Order order)
         {
-            return _orderService.CreateOrder(order);
+            return Request.CreateResponse(HttpStatusCode.Created, _orderService.CreateOrder(order));
         }
 
         [HttpGet]
         [Route]
-        public IEnumerable<Order> GetOrders(DateTime? from = null, DateTime? to = null, string customerName = null)
+        public HttpResponseMessage GetOrders(DateTime? from = null, DateTime? to = null, string customerName = null)
         {   
             var orders = _orderService.GetAll();
 
@@ -51,14 +53,17 @@ namespace WebApplicationExercise.Controllers
             if (customerName != null)
                 orders = _orderService.FilterByCustomer(orders, customerName);
 
-            return _orderService.FilterByCustomer(orders);
+            // todo: maybe move to attribute filter
+            var filteredByCustomer = _orderService.FilterByCustomer(orders);
+            return Request.CreateResponse(HttpStatusCode.OK, filteredByCustomer);
         }
 
         [HttpDelete]
         [Route]
-        public void Remove([FromBody]Order order)
+        public HttpResponseMessage Remove(Guid orderId)
         {
-            _orderService.Remove(order);
+            _orderService.Remove(orderId);
+            return Request.CreateResponse(HttpStatusCode.NoContent);
         }
     }
 }
