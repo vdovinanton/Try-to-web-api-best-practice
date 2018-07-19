@@ -1,7 +1,7 @@
 ﻿using NLog;
-using Serilog;
 using System;
 using WebApplicationExercise.Models;
+using WebApplicationExercise.Utils;
 
 namespace WebApplicationExercise.Core
 {
@@ -19,7 +19,11 @@ namespace WebApplicationExercise.Core
         {
             var config = new NLog.Config.LoggingConfiguration();
 
-            var logfile = new NLog.Targets.FileTarget("logfile") { FileName = "log/file.txt" };
+            var fileNamePrefix = Settings.Instance.LogNameFile;
+            var folder = Settings.Instance.LogFolderPath;
+            var logPath = $"{folder}/fileNamePrefix_{DateTime.Now.ToString("d")}"; 
+
+            var logfile = new NLog.Targets.FileTarget("logfile") { FileName = logPath };
 
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
 

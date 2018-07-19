@@ -15,6 +15,12 @@ namespace WebApplicationExercise.Utils
 
         private Settings() { }
 
-        public string CustomerName => ConfigurationManager.AppSettings["CustomerException"];
+        public string CustomerName => ConfigurationManager.AppSettings["CustomerBanned"];
+
+        /// <summary>
+        /// For example: Solution_folder/Logs
+        /// </summary>
+        public string LogFolderPath => ConfigurationManager.AppSettings["LogFolderPath"];
+        public string LogNameFile => ConfigurationManager.AppSettings["LogNameFile"];
     }
 }
