@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using WebApplicationExercise.Models;
 using System.Data.Entity;
+using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace WebApplicationExercise.Core
 {
@@ -15,43 +17,43 @@ namespace WebApplicationExercise.Core
         /// <summary>
         /// Get all <see cref="Order"/> with <see cref="Product"/>
         /// </summary>
-        IEnumerable<Order> GetAll();
+        Task<IEnumerable<Order>> GetAllAsync();
 
         /// <summary>
         /// Get by <see cref="Guid"/> Id
         /// </summary>
         /// <param name="orderId">Specific Id</param>
-        Order GetBy(Guid orderId);
+        Task<Order> GetByIdAsync(Guid orderId);
 
         /// <summary>
         /// Filtering by current customer name
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="customerName"/> is null</exception>
-        IEnumerable<Order> FilterByCustomer(IEnumerable<Order> orders, string customerName);
+        Task<IEnumerable<Order>> FilterByCustomerAsync(string customerName);
 
         /// <summary>
         /// Filtering by default customer name
         /// </summary>
-        IEnumerable<Order> FilterByCustomer(IEnumerable<Order> orders);
+        Task<IEnumerable<Order>> FilterByCustomerAsync();
 
         /// <summary>
         /// Filtering by range of <see cref="DateTime"/>
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="to"/> earlier than <paramref name="from"/></exception>
-        IEnumerable<Order> FilterByDate(IEnumerable<Order> orders, DateTime from, DateTime to);
-
+        Task<IEnumerable<Order>> FilterByDateAsync(DateTime from, DateTime to);
+        
         /// <param name="order">New <see cref="Order"/></param>
         /// <returns><see cref="Order"/> with new <see cref="Guid"/> Id</returns>
-        Order CreateOrder(Order order);
+        Task<Order> CreateOrderAsync(Order order);
 
         /// <summary>
         /// Modify current <see cref="Order"/>
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="order"/> Id is null</exception>
-        void UpdateOrder(Order order);
+        Task UpdateOrderAsync(Order order);
 
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="order"/> Id is null</exception>
-        void Remove(Guid orderId);
+        Task RemoveAsync(Guid orderId);
     }
     #endregion
     public class OrderService: IOrderService
@@ -66,66 +68,84 @@ namespace WebApplicationExercise.Core
             _customerService = new CustomerService();
         }
 
-        public IEnumerable<Order> GetAll()
+        public async Task<IEnumerable<Order>> GetAllAsync()
         {
-            var result = _db.Orders.Include(o => o.Products);
+            var result = await _db.Orders
+                .AsNoTracking()
+                .Include(o => o.Products)
+                .ToListAsync();
             Logger.Instance.Information($"Get all orders [{result.Count()}]");
             return result;
         }
 
-        public Order GetBy(Guid orderId)
+        public async Task<Order> GetByIdAsync(Guid orderId)
         {
             Logger.Instance.Information($"Get order by Id - {orderId}");
-            return _db.Orders.Include(o => o.Products).FirstOrDefault(o => o.Id == orderId);
+            return await _db.Orders
+                .AsNoTracking()
+                .Include(o => o.Products)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
-        public IEnumerable<Order> FilterByCustomer(IEnumerable<Order> orders, string customerName)
+        public async Task<IEnumerable<Order>> FilterByCustomerAsync(string customerName)
         {
             if (string.IsNullOrWhiteSpace(customerName))
                 throw new ArgumentNullException(nameof(customerName) + "can't be empty or null");
 
-            var result = orders.Where(o => o.Customer == customerName);
-            Logger.Instance.Information($"Filtered orders by {customerName} customer [{orders.Count()}/{result.Count()}]");
+            var result = await _db.Orders
+                .AsNoTracking()
+                .Where(o => o.Customer == customerName)
+                .ToListAsync();
+            Logger.Instance.Information($"Filtered orders by {customerName} customer [{result.Count}]");
             return result;
         }
 
-        public IEnumerable<Order> FilterByCustomer(IEnumerable<Order> orders)
+        public async Task<IEnumerable<Order>> FilterByCustomerAsync()
         {
-            var result = orders.Where(o => _customerService.IsCustomerVisible(o.Customer));
-            Logger.Instance.Information($"Filtered orders by default customer [{orders.Count()}/{result.Count()}]");
+            var result = await _db.Orders
+                .AsNoTracking()
+                .Where(o => _customerService.IsCustomerVisible(o.Customer))
+                .ToListAsync();
+            Logger.Instance.Information($"Filtered orders by default customer [{result.Count()}]");
             return result;
         }
 
-        public IEnumerable<Order> FilterByDate(IEnumerable<Order> orders, DateTime from, DateTime to)
+        public async Task<IEnumerable<Order>> FilterByDateAsync(DateTime from, DateTime to)
         {
             if (DateTime.Compare(from, to) >= 0)
                 throw new ArgumentOutOfRangeException($"{nameof(to)} date can't be earlier than {nameof(from)}");
 
-            var result = orders.Where(o => o.CreatedDate >= from && o.CreatedDate < to);
-            Logger.Instance.Information($"Filtered orders by date [{orders.Count()}/{result.Count()}]");
+            if (from == null && to == null)
+                return null;
+
+            var result = await _db.Orders
+                .AsNoTracking()
+                .Where(o => o.CreatedDate >= DbFunctions.TruncateTime(from) && o.CreatedDate < DbFunctions.TruncateTime(to))
+                .ToListAsync();
+            Logger.Instance.Information($"Filtered orders by date [{result.Count()}]");
             return result;
         }
 
-        public void UpdateOrder(Order order)
+        public async Task UpdateOrderAsync(Order order)
         {
             if (Equals(order.Id, Guid.Empty))
                 throw new ArgumentNullException($"{nameof(order.Id)} can't be empty");
 
-            UpdateOrCreate(order);
+            await UpdateOrCreateAsync(order);
         }
 
-        public Order CreateOrder(Order order)
+        public async Task<Order> CreateOrderAsync(Order order)
         {
-            return UpdateOrCreate(order);
+            return await UpdateOrCreateAsync(order);
         }
 
-        public void Remove(Guid orderId)
+        public async Task RemoveAsync(Guid orderId)
         {
             if (!Equals(orderId, Guid.Empty))
             {
-                var order = GetBy(orderId);
+                var order = GetByIdAsync(orderId);
                 _db.Entry(order).State = EntityState.Deleted;
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
                 Logger.Instance.Information($"Remove order Id - {order.Id}");
             }
             else
@@ -134,29 +154,24 @@ namespace WebApplicationExercise.Core
             }
         }
 
-        private Order UpdateOrCreate(Order order)
+        private async Task<Order> UpdateOrCreateAsync(Order order)
         {
-            var entityState = EntityState.Added;
-            var logTemplate = "Added ";
-            using (_db)
+            if (Equals(order.Id, Guid.Empty))
             {
-                entityState = _db.Orders.Any(_ => _.Id == order.Id) ?
-                    EntityState.Modified :
-                    EntityState.Added;
-
-                if (entityState == EntityState.Modified)
-                {
-                    logTemplate = "Modified ";
-                    foreach(var product in order.Products)
-                        _db.Entry(product).State = EntityState.Modified;
-                }
-
-                _db.Entry(order).State = entityState;
-                _db.SaveChanges();
-
-                var productCount = order.Products == null ? 0 : order.Products.Count;
-                Logger.Instance.Information(logTemplate + $"orderId - {order.Id} with {productCount} products");
+                _db.Orders.Add(order);
+                Logger.Instance.Information($"Added orderId - {order.Id} with {order.Products.Count} products");
             }
+            else
+            {
+                _db.Entry(order).State = EntityState.Modified;
+
+                foreach (var product in order.Products)
+                    _db.Entry(product).State = EntityState.Modified;
+
+                Logger.Instance.Information($"Modified orderId - {order.Id} with {order.Products.Count} products");
+            }
+
+            await _db.SaveChangesAsync();
             return order;
         }
     }

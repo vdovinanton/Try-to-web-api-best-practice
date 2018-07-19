@@ -18,7 +18,7 @@ namespace WebApplicationExercise
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             GlobalConfiguration.Configuration.Filters.Add(new ExceptionHandler());
-            GlobalConfiguration.Configuration.Filters.Add(new CustomActionAttribute());
+            GlobalConfiguration.Configuration.Filters.Add(new ExecutionTimeAttribute());
 
 
             Logger.Instance.Information("Application started");

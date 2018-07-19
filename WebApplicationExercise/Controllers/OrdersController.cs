@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using WebApplicationExercise.Core;
 using WebApplicationExercise.Models;
 
@@ -19,51 +19,48 @@ namespace WebApplicationExercise.Controllers
         
         [HttpGet]
         [Route("{orderId}")]
-        public HttpResponseMessage GetOrder(Guid orderId)
+        public async Task<Order> GetOrder(Guid orderId)
         {
-            var result = _orderService.GetBy(orderId);
-            var statusCode = result != null ? HttpStatusCode.OK : HttpStatusCode.NotFound;
-            return Request.CreateResponse(statusCode, result);
+            return await _orderService.GetByIdAsync(orderId);
         }
 
         [HttpPost]
-        [Route]
-        public HttpResponseMessage UpdateOrder([FromBody]Order order)
+        public async Task UpdateOrder([FromBody]Order order)
         {
-            _orderService.UpdateOrder(order);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            await _orderService.UpdateOrderAsync(order);
         }
 
         [HttpPut]
-        [Route]
-        public HttpResponseMessage CreateOrder([FromBody]Order order)
+        public async Task CreateOrder([FromBody]Order order)
         {
-            return Request.CreateResponse(HttpStatusCode.Created, _orderService.CreateOrder(order));
+            await _orderService.CreateOrderAsync(order);
         }
 
         [HttpGet]
-        [Route]
-        public HttpResponseMessage GetOrders(DateTime? from = null, DateTime? to = null, string customerName = null)
-        {   
-            var orders = _orderService.GetAll();
+        public async Task<IEnumerable<Order>> GetOrders(DateTime? from = null, DateTime? to = null, string customerName = null)
+        {
+            IEnumerable<Order> orders;
 
-            if (from != null && to != null)
-                orders = _orderService.FilterByDate(orders, from.Value, to.Value);
+            // wrong
+            //if (from != null && to != null)
+            //orders = await _orderService.FilterByDateAsync(from.Value, to.Value);
 
-            if (customerName != null)
-                orders = _orderService.FilterByCustomer(orders, customerName);
+            //if (customerName != null)
+            //orders = await _orderService.FilterByCustomerAsync(customerName);
 
-            // todo: maybe move to attribute filter
-            var filteredByCustomer = _orderService.FilterByCustomer(orders);
-            return Request.CreateResponse(HttpStatusCode.OK, filteredByCustomer);
+            orders = await _orderService.FilterByDateAsync(from.Value, to.Value);
+
+            if ((from == null && to == null) && customerName == null)
+                orders = await _orderService.GetAllAsync();
+
+            
+            return await _orderService.FilterByCustomerAsync(); ;
         }
 
         [HttpDelete]
-        [Route]
-        public HttpResponseMessage Remove(Guid orderId)
+        public async Task Remove(Guid orderId)
         {
-            _orderService.Remove(orderId);
-            return Request.CreateResponse(HttpStatusCode.NoContent);
+            await _orderService.RemoveAsync(orderId);
         }
     }
 }
