@@ -23,17 +23,11 @@ namespace WebApplicationExercise.Controllers
         {
             return await _orderService.GetByIdAsync(orderId);
         }
-
-        [HttpPost]
-        public async Task UpdateOrder([FromBody]Order order)
-        {
-            await _orderService.UpdateOrderAsync(order);
-        }
-
+        
         [HttpPut]
-        public async Task CreateOrder([FromBody]Order order)
+        public async Task<Guid> UpdateOrCreateOrder([FromBody]Order order)
         {
-            await _orderService.CreateOrderAsync(order);
+            return await _orderService.UpdateOrCreateOrderAsync(order);
         }
 
         [HttpGet]
@@ -41,20 +35,18 @@ namespace WebApplicationExercise.Controllers
         {
             IEnumerable<Order> orders;
 
-            // wrong
-            //if (from != null && to != null)
-            //orders = await _orderService.FilterByDateAsync(from.Value, to.Value);
-
-            //if (customerName != null)
-            //orders = await _orderService.FilterByCustomerAsync(customerName);
-
-            orders = await _orderService.FilterByDateAsync(from.Value, to.Value);
-
             if ((from == null && to == null) && customerName == null)
+            {
                 orders = await _orderService.GetAllAsync();
+            }
+            else
+            {
+                var datetimeFrom = from ?? DateTime.MinValue;
+                var datetimeTo = to ?? DateTime.MinValue;
+                orders = await _orderService.OrderFilterAsync(datetimeFrom, datetimeTo, customerName);
+            }
 
-            
-            return await _orderService.FilterByCustomerAsync(); ;
+            return orders;
         }
 
         [HttpDelete]

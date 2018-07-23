@@ -1,5 +1,6 @@
 ﻿using NLog;
 using System;
+using System.Globalization;
 using WebApplicationExercise.Models;
 using WebApplicationExercise.Utils;
 
@@ -21,7 +22,7 @@ namespace WebApplicationExercise.Core
 
             var fileNamePrefix = Settings.Instance.LogNameFile;
             var folder = Settings.Instance.LogFolderPath;
-            var logPath = $"{folder}/fileNamePrefix_{DateTime.Now.ToString("d")}"; 
+            var logPath = $"{folder}/{fileNamePrefix}_{DateTime.Now.ToString("d", CultureInfo.CreateSpecificCulture("de-DE"))}.txt"; 
 
             var logfile = new NLog.Targets.FileTarget("logfile") { FileName = logPath };
 

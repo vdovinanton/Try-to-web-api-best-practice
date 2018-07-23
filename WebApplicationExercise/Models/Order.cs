@@ -16,10 +16,5 @@ namespace WebApplicationExercise.Models
         public string Customer { get; set; }
 
         public ICollection<Product> Products { get; set; }
-
-        public Order()
-        {
-            Products = new HashSet<Product>();
-        }
     }
 }

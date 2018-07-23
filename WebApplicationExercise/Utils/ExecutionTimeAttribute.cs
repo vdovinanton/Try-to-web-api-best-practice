@@ -49,7 +49,7 @@ namespace WebApplicationExercise.Utils
                 if (actionExecutedContext.Response != null)
                 {
                     Logger.Instance.Information($"Executed request {actionExecutedContext.Request.Method.Method} {actionExecutedContext.Request.RequestUri.AbsolutePath} " +
-                        $" - Time taken: {timestamp.ToString()}ms; for GUID [{correlectionId}]");
+                        $" - Time taken: {timestamp.ToString()}ms; for CorrelationId [{correlectionId}]");
                 }
             });
         }
