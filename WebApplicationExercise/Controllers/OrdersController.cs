@@ -11,10 +11,11 @@ namespace WebApplicationExercise.Controllers
     public class OrdersController : ApiController
     {
         private readonly IOrderService _orderService;
-        public OrdersController()
+        public OrdersController(IOrderService orderService)
         {
             // or via IoC
-            _orderService = new OrderService();
+            //_orderService = new OrderService();
+            _orderService = orderService;
         }
         
         [HttpGet]

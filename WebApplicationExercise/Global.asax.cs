@@ -20,7 +20,8 @@ namespace WebApplicationExercise
             GlobalConfiguration.Configuration.Filters.Add(new ExceptionHandler());
             GlobalConfiguration.Configuration.Filters.Add(new ExecutionTimeAttribute());
 
-
+            NinjectHttpContainer.RegisterModules(NinjectHttpModules.Modules);
+            
             Logger.Instance.Information("Application started");
         }
     }
