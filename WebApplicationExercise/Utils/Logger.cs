@@ -20,6 +20,7 @@ namespace WebApplicationExercise.Core
         {
             var config = new NLog.Config.LoggingConfiguration();
 
+            // todo im sure that it costyl thats why i should invstt nlogger
             var fileNamePrefix = Settings.Instance.LogNameFile;
             var folder = Settings.Instance.LogFolderPath;
             var logPath = $"{folder}/{fileNamePrefix}_{DateTime.Now.ToString("d", CultureInfo.CreateSpecificCulture("de-DE"))}.txt"; 

@@ -224,3 +224,23 @@ project.lock.json
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####
+/.vs/WebApplicationExercise/v14/.suo
+*.dll
+*.pdb
+
+#Ignore thumbnails created by Windows
+#Ignore files built by Visual Studio
+*.exe
+*.bak
+*.cache
+[Bb]in
+[Dd]ebug*/
+*.lib
+[Rr]elease*/
+[Tt]est[Rr]esult*
+#Nuget packages folder
+/WebApplicationExercise/App_Data/WebApplicationExercise.Core.MainDataContext.mdf
+/WebApplicationExercise/App_Data/WebApplicationExercise.Core.MainDataContext_log.ldf
+/WebApplicationExercise/App_Data/WebApplicationExercise.Core.MainDataContext.mdf
+/WebApplicationExercise/App_Data/WebApplicationExercise.Core.MainDataContext_log.ldf
+/.vs/WebApplicationExercise/v14/.suo

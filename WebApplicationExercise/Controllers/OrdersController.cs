@@ -2,8 +2,8 @@
 using System.Web.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using WebApplicationExercise.Core;
 using WebApplicationExercise.Models;
+using WebApplicationExercise.Core.Interfaces;
 
 namespace WebApplicationExercise.Controllers
 {
@@ -13,8 +13,6 @@ namespace WebApplicationExercise.Controllers
         private readonly IOrderService _orderService;
         public OrdersController(IOrderService orderService)
         {
-            // or via IoC
-            //_orderService = new OrderService();
             _orderService = orderService;
         }
         

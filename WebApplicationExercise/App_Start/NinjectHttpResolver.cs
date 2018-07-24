@@ -1,29 +1,14 @@
 ﻿
 using Ninject;
 using Ninject.Modules;
+using Ninject.Web.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Web;
 using System.Web.Http;
 using System.Web.Http.Dependencies;
 using WebApplicationExercise.Core;
-
-//  A small Library to configure Ninject (A Dependency Injection Library) with a WebAPI Application. 
-//  To configure, take the following steps.
-// 
-//  1. Install Packages Ninject and Ninject.Web.Common 
-//  2. Remove NinjectWebCommon.cs in your App_Start Directory
-//  3. Add this file to your project  (preferrably in the App_Start Directory)  
-//  4. Add Your Bindings to the Load method of MainModule. 
-//     You can add as many additional modules to keep things organized
-//     simply add them to the Modules property of the NinjectModules class
-//  5. Add the following Line to your Global.asax
-//          NinjectHttpContainer.RegisterModules(NinjectHttpModules.Modules);  
-//  5b.To Automatically Register all NinjectModules in the Current Project, You should instead add
-//          NinjectContainer.RegisterAssembly()
-//  You are done. 
+using WebApplicationExercise.Core.Interfaces;
 
 namespace WebApplicationExercise.Utils
 {
@@ -65,9 +50,6 @@ namespace WebApplicationExercise.Utils
         }
     }
 
-
-    // List and Describe Necessary HttpModules
-    // This class is optional if you already Have NinjectMvc
     public class NinjectHttpModules
     {
         //Return Lists of Modules in the Application
@@ -85,7 +67,9 @@ namespace WebApplicationExercise.Utils
             public override void Load()
             {
                 //TODO: Bind to Concrete Types Here
+                Bind<MainDataContext>().ToSelf().InRequestScope();
                 Bind<IOrderService>().To<OrderService>();
+                Bind<ICustomerService>().To<CustomerService>();
             }
         }
     }

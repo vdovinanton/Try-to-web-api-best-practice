@@ -8,11 +8,12 @@ namespace WebApplicationExercise.Models
     public class Order
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
+        [Column(TypeName = "date")]
         public DateTime CreatedDate { get; set; }
 
+        [Column(TypeName = "varchar")]
         public string Customer { get; set; }
 
         public ICollection<Product> Products { get; set; }

@@ -224,6 +224,8 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Core\CustomerService.cs" />
+    <Compile Include="Core\Interfaces\ICustomerService.cs" />
+    <Compile Include="Core\Interfaces\IOrderService.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="Core\MainDataContext.cs" />
