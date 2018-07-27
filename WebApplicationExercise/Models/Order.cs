@@ -9,13 +9,10 @@ namespace WebApplicationExercise.Models
     {
         [Key]
         public Guid Id { get; set; }
-
-        [Column(TypeName = "date")]
         public DateTime CreatedDate { get; set; }
 
-        [Column(TypeName = "varchar")]
+        [MaxLength(30)]
         public string Customer { get; set; }
-
         public ICollection<Product> Products { get; set; }
     }
 }
