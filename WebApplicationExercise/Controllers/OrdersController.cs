@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using WebApplicationExercise.Models;
 using WebApplicationExercise.Core.Interfaces;
 using WebApplicationExercise.ViewModels;
-using WebApplicationExercise.Utils;
-using System.Linq;
+using AutoMapper;
 
 namespace WebApplicationExercise.Controllers
 {
@@ -14,9 +13,11 @@ namespace WebApplicationExercise.Controllers
     public class OrdersController : ApiController
     {
         private readonly IOrderService _orderService;
-        public OrdersController(IOrderService orderService)
+        private readonly IMapper _mapper;
+        public OrdersController(IOrderService orderService, IMapper mapper)
         {
             _orderService = orderService;
+            _mapper = mapper;
         }
         
         [HttpGet]
@@ -24,39 +25,13 @@ namespace WebApplicationExercise.Controllers
         public async Task<OrderViewModel> GetOrder(int orderId)
         {
             var order = await _orderService.GetByIdAsync(orderId);
-
-            var orderViewModel = new OrderViewModel
-            {
-                Id = order.Id,
-                CreatedDate = order.CreatedDate.ConvertFromUnixToStringUtc(),
-                CustomerName = order.CustomerName,
-                Products = order.Products?.Select(_ => new ProductViewModel {
-                    Id = _.Id,
-                    Name = _.Name,
-                    Price = _.Price
-                }).ToList()
-            };
-
-            return orderViewModel;
+            return _mapper.Map<OrderViewModel>(order); ;
         }
         
         [HttpPut]
         public async Task<int> UpdateOrCreateOrder([FromBody]OrderViewModel orderViewModel)
         {
-            var order = new Order
-            {
-                Id = orderViewModel.Id,
-                CreatedDate = orderViewModel.CreatedDate.ConvertFromStringToUnix(),
-                CustomerName = orderViewModel.CustomerName,
-                Products = orderViewModel.Products?.Select(_ => new Product
-                {
-                    Id = _.Id,
-                    Name = _.Name,
-                    OrderId = orderViewModel.Id,
-                    Price = _.Price
-                }).ToList()
-            };
-
+            var order = _mapper.Map<Order>(orderViewModel);
             return await _orderService.UpdateOrCreateOrderAsync(order);
         }
 
@@ -75,21 +50,8 @@ namespace WebApplicationExercise.Controllers
                 var datetimeTo = to ?? DateTime.MinValue;
                 orders = await _orderService.OrderFilterAsync(datetimeFrom, datetimeTo, customerName);
             }
-
-            var ordersViewModel = orders.Select(_ => new OrderViewModel
-            {
-                Id = _.Id,
-                CreatedDate = _.CreatedDate.ConvertFromUnixToStringUtc(),
-                CustomerName = _.CustomerName,
-                Products = _.Products?.Select(p => new ProductViewModel
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price
-                }).ToList()
-            }).ToList();
             
-            return ordersViewModel;
+            return _mapper.Map<IEnumerable<OrderViewModel>>(orders);
         }
 
         [HttpDelete]
