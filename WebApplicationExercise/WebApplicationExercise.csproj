@@ -228,7 +228,7 @@
     <Compile Include="Core\Interfaces\IOrderService.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Logger.cs" />
-    <Compile Include="Core\MainDataContext.cs" />
+    <Compile Include="Core\DataContext.cs" />
     <Compile Include="Core\OrderService.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -242,6 +242,8 @@
     <Compile Include="App_Start\NinjectHttpResolver.cs" />
     <Compile Include="Utils\NinjectResolver.cs" />
     <Compile Include="Utils\Settings.cs" />
+    <Compile Include="ViewModels\OrderViewModel.cs" />
+    <Compile Include="ViewModels\ProductViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

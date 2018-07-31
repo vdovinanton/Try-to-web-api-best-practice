@@ -3,7 +3,7 @@ using WebApplicationExercise.Models;
 
 namespace WebApplicationExercise.Core
 {
-    public class MainDataContext : DbContext
+    public class DataContext : DbContext
     {
         public DbSet<Order> Orders { get; set; }
 

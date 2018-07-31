@@ -11,10 +11,10 @@ namespace WebApplicationExercise.Core
 {
     public class OrderService: IOrderService
     {
-        private readonly MainDataContext _db;
+        private readonly DataContext _db;
         private readonly ICustomerService _customerService;
 
-        public OrderService(MainDataContext db, ICustomerService customerService)
+        public OrderService(DataContext db, ICustomerService customerService)
         {
             _db = db;
             _customerService = customerService;
@@ -30,7 +30,7 @@ namespace WebApplicationExercise.Core
             return result;
         }
 
-        public async Task<Order> GetByIdAsync(Guid orderId)
+        public async Task<Order> GetByIdAsync(int orderId)
         {
             Logger.Instance.Information($"Get order by Id - {orderId}");
             return await _db.Orders
@@ -44,7 +44,7 @@ namespace WebApplicationExercise.Core
             Logger.Instance.Information($"Filtered orders by customer {Settings.Instance.CustomerName}");
             return _db.Orders
                 .AsNoTracking()
-                .Where(o => _customerService.IsCustomerVisible(o.Customer));
+                .Where(o => _customerService.IsCustomerVisible(o.CustomerName));
         }
 
         private IQueryable<Order> FilterByCustomer(string customerName)
@@ -52,7 +52,7 @@ namespace WebApplicationExercise.Core
             Logger.Instance.Information($"Filtered orders by customer {customerName}");
             return _db.Orders
                 .AsNoTracking()
-                .Where(o => o.Customer == customerName);
+                .Where(o => o.CustomerName == customerName);
         }
 
         private IQueryable<Order> FilterByDate(DateTime from, DateTime to)
@@ -60,7 +60,7 @@ namespace WebApplicationExercise.Core
             Logger.Instance.Information($"Filtered orders by date");
             return _db.Orders
                 .AsNoTracking()
-                .Where(o => o.CreatedDate >= DbFunctions.TruncateTime(from) && o.CreatedDate < DbFunctions.TruncateTime(to));
+                .Where(o => o.CreatedDate.ConvertFromUnixTimestamp() >= DbFunctions.TruncateTime(from) && o.CreatedDate.ConvertFromUnixTimestamp() < DbFunctions.TruncateTime(to));
         }
 
         public async Task<IEnumerable<Order>> OrderFilterAsync(DateTime from, DateTime to, string customerName)
@@ -70,15 +70,15 @@ namespace WebApplicationExercise.Core
 
             IQueryable<Order> result = FilterByCustomer();
             if (from != null && to != null)
-                result = result.Union(FilterByDate(from, to));
+                result = result.Union(FilterByDate(from, to)); //todo: << Union remove
 
             if(customerName != null)
-                result = result.Union(FilterByCustomer(customerName));
+                result = result.Union(FilterByCustomer(customerName)); //todo: << Union remove
 
             return await result.ToListAsync();
         }
 
-        public async Task<Guid> UpdateOrCreateOrderAsync(Order order)
+        public async Task<int> UpdateOrCreateOrderAsync(Order order)
         {
             var originalOrder = _db.Orders
                 .AsNoTracking()
@@ -104,9 +104,9 @@ namespace WebApplicationExercise.Core
         }
 
 
-        public async Task RemoveAsync(Guid orderId)
+        public async Task RemoveAsync(int orderId)
         {
-            if (!Equals(orderId, Guid.Empty))
+            if (!Equals(orderId, default(int)))
             {
                 var order = GetByIdAsync(orderId);
                 _db.Entry(order).State = EntityState.Deleted;

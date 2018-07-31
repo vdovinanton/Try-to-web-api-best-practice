@@ -67,7 +67,7 @@ namespace WebApplicationExercise.Utils
             public override void Load()
             {
                 //TODO: Bind to Concrete Types Here
-                Bind<MainDataContext>().ToSelf().InRequestScope();
+                Bind<DataContext>().ToSelf().InRequestScope();
                 Bind<IOrderService>().To<OrderService>();
                 Bind<ICustomerService>().To<CustomerService>();
             }

@@ -17,10 +17,10 @@ namespace WebApplicationExercise.Core.Interfaces
         Task<IEnumerable<Order>> GetAllAsync();
 
         /// <summary>
-        /// Get by <see cref="Guid"/> Id
+        /// Get by <see cref="int"/> Id
         /// </summary>
         /// <param name="orderId">Specific Id</param>
-        Task<Order> GetByIdAsync(Guid orderId);
+        Task<Order> GetByIdAsync(int orderId);
 
         /// <summary>
         /// Filter <see cref="IEnumerable{Order}"/> by time rane or/and by <paramref name="customerName"/>
@@ -36,10 +36,10 @@ namespace WebApplicationExercise.Core.Interfaces
         /// </summary>
         /// <exception cref="ArgumentException">Thrown when one of two dates is empty</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="to"/> earlier then <paramref name="from"/></exception>
-        Task<Guid> UpdateOrCreateOrderAsync(Order order);
+        Task<int> UpdateOrCreateOrderAsync(Order order);
 
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="order"/> Id is null</exception>
-        Task RemoveAsync(Guid orderId);
+        Task RemoveAsync(int orderId);
     }
     #endregion
 }
