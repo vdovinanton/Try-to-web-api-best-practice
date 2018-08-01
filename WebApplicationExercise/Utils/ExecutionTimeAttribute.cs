@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
@@ -10,7 +11,8 @@ namespace WebApplicationExercise.Utils
     public class ExecutionTimeAttribute : ActionFilterAttribute
     {
         private const string StartTimeKey = "StartTime";
-        private const string CorrelationIdKey = "CorrelationId";
+        //private const string CorrelationIdKey = "CorrelationId";
+        private readonly NLog.Logger _logger = LogManager.GetCurrentClassLogger();
 
         public override Task OnActionExecutingAsync(HttpActionContext actionContext,
             CancellationToken cancellationToken)
@@ -21,10 +23,12 @@ namespace WebApplicationExercise.Utils
                     .ConvertToUnixTimestamp();
 
                 actionContext.Request.Properties.Add(StartTimeKey, timestamp);
-                actionContext.Request.Properties.Add(CorrelationIdKey, correlationId);
+                //actionContext.Request.Properties.Add(CorrelationIdKey, correlationId);
 
-                Logger.Instance.Information($"Executing request: {actionContext.ControllerContext.Request.Method.Method} " + 
-                    $" {actionContext.ControllerContext.Request.RequestUri.AbsolutePath}; for CorrelationId: [{correlationId}]");
+                //Logger.Instance.Information($"Executing request: {actionContext.ControllerContext.Request.Method.Method} " + 
+                //    $" {actionContext.ControllerContext.Request.RequestUri.AbsolutePath};");
+                _logger.Info($"Executing request: {actionContext.ControllerContext.Request.Method.Method} " +
+                    $" {actionContext.ControllerContext.Request.RequestUri.AbsolutePath};");
             });
         }
 
@@ -33,9 +37,9 @@ namespace WebApplicationExercise.Utils
         {
             return Task.Run(() => {
                 double timestamp = default(double);
-                string correlectionId = actionExecutedContext.Request.Properties.ContainsKey(CorrelationIdKey) ?
-                    actionExecutedContext.Request.Properties[CorrelationIdKey].ToString() :
-                    string.Empty;
+                //string correlectionId = actionExecutedContext.Request.Properties.ContainsKey(CorrelationIdKey) ?
+                //    actionExecutedContext.Request.Properties[CorrelationIdKey].ToString() :
+                //    string.Empty;
 
                 if (actionExecutedContext.Request.Properties.ContainsKey(StartTimeKey))
                 {
@@ -48,8 +52,10 @@ namespace WebApplicationExercise.Utils
 
                 if (actionExecutedContext.Response != null)
                 {
-                    Logger.Instance.Information($"Executed request {actionExecutedContext.Request.Method.Method} {actionExecutedContext.Request.RequestUri.AbsolutePath} " +
-                        $" - Time taken: {timestamp.ToString()}ms; for CorrelationId [{correlectionId}]");
+                    //Logger.Instance.Information($"Executed request {actionExecutedContext.Request.Method.Method} {actionExecutedContext.Request.RequestUri.AbsolutePath} " +
+                    //    $" - Time taken: {timestamp.ToString()}ms;");
+                    _logger.Info($"Executed request {actionExecutedContext.Request.Method.Method} {actionExecutedContext.Request.RequestUri.AbsolutePath} " +
+                        $" - Time taken: {timestamp.ToString()}ms;");
                 }
             });
         }

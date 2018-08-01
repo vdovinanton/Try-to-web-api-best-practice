@@ -235,7 +235,6 @@
     <Compile Include="Core\Interfaces\ICustomerService.cs" />
     <Compile Include="Core\Interfaces\IOrderService.cs" />
     <Compile Include="Utils\Extensions.cs" />
-    <Compile Include="Utils\Logger.cs" />
     <Compile Include="Core\DataContext.cs" />
     <Compile Include="Core\OrderService.cs" />
     <Compile Include="Global.asax.cs">

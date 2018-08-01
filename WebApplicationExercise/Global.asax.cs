@@ -1,4 +1,7 @@
-﻿using System.Web.Http;
+﻿using NLog;
+using System;
+using System.Diagnostics;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
@@ -9,6 +12,7 @@ namespace WebApplicationExercise
 {
     public class WebApiApplication : System.Web.HttpApplication
     {
+        private readonly NLog.Logger _logger = LogManager.GetCurrentClassLogger();
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
@@ -22,7 +26,13 @@ namespace WebApplicationExercise
 
             NinjectHttpContainer.RegisterModules(NinjectHttpModules.Modules);
             
-            Logger.Instance.Information("Application started");
+            //Logger.Instance.Information("Application started");
+            _logger.Info("Application started");
+        }
+
+        protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+                Trace.CorrelationManager.ActivityId = Guid.NewGuid();
         }
     }
 }

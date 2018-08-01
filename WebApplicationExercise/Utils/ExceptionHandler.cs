@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Data;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
@@ -7,7 +8,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Filters;
-using WebApplicationExercise.Core;
 using WebApplicationExercise.Models;
 
 namespace WebApplicationExercise.Utils
@@ -15,6 +15,8 @@ namespace WebApplicationExercise.Utils
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
     public class ExceptionHandler : ExceptionFilterAttribute
     {
+        private readonly NLog.Logger _logger = LogManager.GetCurrentClassLogger();
+
         public override Task OnExceptionAsync(HttpActionExecutedContext context,
             CancellationToken cancellationToken)
         {
@@ -65,7 +67,8 @@ namespace WebApplicationExercise.Utils
                     context.Response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
                 }
 
-                Logger.Instance.Error(exceptionLogInfo, isCriticalError);
+                //Logger.Instance.Error(exceptionLogInfo, isCriticalError);
+                Error(exceptionLogInfo, isCriticalError);
             });
         }
 
@@ -81,6 +84,14 @@ namespace WebApplicationExercise.Utils
                     Methood = context.Request.Method.Method
                 }
             };
+        }
+
+        private void Error(ExceptionLog exception, bool isCritical = false)
+        {
+            var callStack = isCritical ? Environment.NewLine + exception.CallStack : string.Empty;
+            var messageTemplate = $"{ exception.RequestInfo.Methood } { exception.RequestInfo.Uri } - { exception.Type } - { exception.Message.Replace('\r', ' ').Replace('\n', ' ') } { callStack }";
+
+            _logger.Error(messageTemplate);
         }
     }
 }

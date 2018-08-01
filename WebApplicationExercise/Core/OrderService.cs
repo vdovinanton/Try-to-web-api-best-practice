@@ -6,6 +6,7 @@ using System.Data.Entity;
 using System.Threading.Tasks;
 using WebApplicationExercise.Utils;
 using WebApplicationExercise.Core.Interfaces;
+using NLog;
 
 namespace WebApplicationExercise.Core
 {
@@ -13,6 +14,8 @@ namespace WebApplicationExercise.Core
     {
         private readonly DataContext _db;
         private readonly ICustomerService _customerService;
+
+        private readonly NLog.Logger _logger = LogManager.GetCurrentClassLogger();
 
         public OrderService(DataContext db, ICustomerService customerService)
         {
@@ -26,13 +29,15 @@ namespace WebApplicationExercise.Core
                 .AsNoTracking()
                 .Include(o => o.Products)
                 .ToListAsync();
-            Logger.Instance.Information($"Get all orders [{result.Count()}]");
+            //Logger.Instance.Information($"Get all orders [{result.Count()}]");
+            _logger.Info($"Get all orders [{result.Count()}]");
             return result;
         }
 
         public async Task<Order> GetByIdAsync(int orderId)
         {
-            Logger.Instance.Information($"Get order by Id - {orderId}");
+            //Logger.Instance.Information($"Get order by Id - {orderId}");
+            _logger.Info($"Get order by Id - {orderId}");
             return await _db.Orders
                 .AsNoTracking()
                 .Include(o => o.Products)
@@ -41,7 +46,8 @@ namespace WebApplicationExercise.Core
 
         private IQueryable<Order> FilterByCustomer()
         {
-            Logger.Instance.Information($"Filtered orders by customer {Settings.Instance.CustomerName}");
+            //Logger.Instance.Information($"Filtered orders by customer {Settings.Instance.CustomerName}");
+            _logger.Info($"Filtered orders by customer {Settings.Instance.CustomerName}");
             return _db.Orders
                 .AsNoTracking()
                 .Where(o => _customerService.IsCustomerVisible(o.CustomerName));
@@ -49,7 +55,8 @@ namespace WebApplicationExercise.Core
 
         private IQueryable<Order> FilterByCustomer(string customerName)
         {
-            Logger.Instance.Information($"Filtered orders by customer {customerName}");
+            //Logger.Instance.Information($"Filtered orders by customer {customerName}");
+            _logger.Info($"Filtered orders by customer {customerName}");
             return _db.Orders
                 .AsNoTracking()
                 .Where(o => o.CustomerName == customerName);
@@ -57,7 +64,8 @@ namespace WebApplicationExercise.Core
 
         private IQueryable<Order> FilterByDate(DateTime from, DateTime to)
         {
-            Logger.Instance.Information($"Filtered orders by date");
+            //Logger.Instance.Information($"Filtered orders by date");
+            _logger.Info($"Filtered orders by date");
             return _db.Orders
                 .AsNoTracking()
                 .Where(o => o.CreatedDate.ConvertFromUnixTimestamp() >= DbFunctions.TruncateTime(from) && o.CreatedDate.ConvertFromUnixTimestamp() < DbFunctions.TruncateTime(to));
@@ -87,7 +95,8 @@ namespace WebApplicationExercise.Core
             if (!_db.Orders.AsNoTracking().Any(_ => _.Id == order.Id))
             {
                 _db.Orders.Add(order);
-                Logger.Instance.Information($"Added orderId - {order.Id} with {order.Products.Count} products");
+                //Logger.Instance.Information($"Added orderId - {order.Id} with {order.Products.Count} products");
+                _logger.Info($"Added orderId - {order.Id} with {order.Products.Count} products");
             }
             else
             {
@@ -95,7 +104,8 @@ namespace WebApplicationExercise.Core
                 foreach(var product in order.Products)
                     _db.Entry(product).State = EntityState.Modified;
 
-                Logger.Instance.Information($"Modified orderId - {order.Id} with {order.Products.Count} products");
+                //Logger.Instance.Information($"Modified orderId - {order.Id} with {order.Products.Count} products");
+                _logger.Info($"Modified orderId - {order.Id} with {order.Products.Count} products");
             }
 
             await _db.SaveChangesAsync();
@@ -111,7 +121,8 @@ namespace WebApplicationExercise.Core
                 var order = GetByIdAsync(orderId);
                 _db.Entry(order).State = EntityState.Deleted;
                 await _db.SaveChangesAsync();
-                Logger.Instance.Information($"Remove order Id - {order.Id}");
+                //Logger.Instance.Information($"Remove order Id - {order.Id}");
+                _logger.Info($"Remove order Id - {order.Id}");
             }
             else
             {
