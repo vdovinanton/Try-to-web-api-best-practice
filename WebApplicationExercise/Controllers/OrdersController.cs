@@ -38,19 +38,15 @@ namespace WebApplicationExercise.Controllers
         [HttpGet]
         public async Task<IEnumerable<OrderViewModel>> GetOrders(DateTime? from = null, DateTime? to = null, string customerName = null)
         {
-            IEnumerable<Order> orders;
+            //IEnumerable<Order> orders;
 
-            if ((from == null && to == null) && customerName == null)
-            {
-                orders = await _orderService.GetAllAsync();
-            }
-            else
-            {
-                var datetimeFrom = from ?? DateTime.MinValue;
-                var datetimeTo = to ?? DateTime.MinValue;
-                orders = await _orderService.OrderFilterAsync(datetimeFrom, datetimeTo, customerName);
-            }
-            
+            //if ((from == null && to == null) && customerName == null)
+            //    orders = await _orderService.GetAllAsync();
+            //else
+            //    orders = await _orderService.OrderFilterAsync(from, to, customerName);
+
+            var orders = await _orderService.OrderFilterAsync(from, to, customerName);
+
             return _mapper.Map<IEnumerable<OrderViewModel>>(orders);
         }
 

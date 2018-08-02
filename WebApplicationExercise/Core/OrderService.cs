@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using WebApplicationExercise.Utils;
 using WebApplicationExercise.Core.Interfaces;
 using NLog;
+using System.Linq.Expressions;
+using Antlr.Runtime.Misc;
+using NJection.LambdaConverter.Fluent;
 
 namespace WebApplicationExercise.Core
 {
@@ -44,15 +47,26 @@ namespace WebApplicationExercise.Core
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
+        //private IQueryable<Order> FilterByCustomer(Expression<Func<Order, bool>> predicate)
         private IQueryable<Order> FilterByCustomer()
         {
             //Logger.Instance.Information($"Filtered orders by customer {Settings.Instance.CustomerName}");
             _logger.Info($"Filtered orders by customer {Settings.Instance.CustomerName}");
-            return _db.Orders
-                .AsNoTracking()
-                .Where(o => _customerService.IsCustomerVisible(o.CustomerName));
-        }
 
+            //var lambda = Lambda.TransformMethodTo<System.Func<Order, bool>>()
+            //                   .From(() => _customerService.IsCustomerVisible)
+            //                   .ToLambda();
+
+
+
+            //return _db.Orders
+            //    .AsNoTracking()
+            //    .Include(q => q.Products)
+            //    //.Select(q => lambda(q.CustomerName));
+            //    .Where(lambda);
+            //.Where(predicate); //o => _customerService.IsCustomerVisible(o.CustomerName)
+            return null;
+        }
         private IQueryable<Order> FilterByCustomer(string customerName)
         {
             //Logger.Instance.Information($"Filtered orders by customer {customerName}");
@@ -62,29 +76,52 @@ namespace WebApplicationExercise.Core
                 .Where(o => o.CustomerName == customerName);
         }
 
-        private IQueryable<Order> FilterByDate(DateTime from, DateTime to)
-        {
-            //Logger.Instance.Information($"Filtered orders by date");
-            _logger.Info($"Filtered orders by date");
-            return _db.Orders
-                .AsNoTracking()
-                .Where(o => o.CreatedDate.ConvertFromUnixTimestamp() >= DbFunctions.TruncateTime(from) && o.CreatedDate.ConvertFromUnixTimestamp() < DbFunctions.TruncateTime(to));
-        }
+        //private IQueryable<Order> FilterByDate(DateTime from, DateTime to)
+        //{
+        //    //Logger.Instance.Information($"Filtered orders by date");
+        //    _logger.Info($"Filtered orders by date");
+        //    return _db.Orders
+        //        .AsNoTracking()
+        //        .Where(o => o.CreatedDate.ConvertFromUnixTimestamp() >= DbFunctions.TruncateTime(from) && o.CreatedDate.ConvertFromUnixTimestamp() < DbFunctions.TruncateTime(to));
+        //}
 
-        public async Task<IEnumerable<Order>> OrderFilterAsync(DateTime from, DateTime to, string customerName)
+        public async Task<IEnumerable<Order>> OrderFilterAsync(DateTime? from, DateTime? to, string customerName)
         {
-            if (DateTime.Compare(from, to) >= 0)
+            if ((from != null && to != null) && (DateTime.Compare(from.Value, to.Value) > 0))
                 throw new ArgumentOutOfRangeException($"{nameof(to)} date can't be earlier than {nameof(from)}");
 
-            IQueryable<Order> result = FilterByCustomer();
-            if (from != null && to != null)
-                result = result.Union(FilterByDate(from, to)); //todo: << Union remove
+            string bannedCustomerName = string.Empty;
+            _customerService.IsCustomerVisible(customerName, out bannedCustomerName);
 
-            if(customerName != null)
-                result = result.Union(FilterByCustomer(customerName)); //todo: << Union remove
+            IQueryable<Order> filter = _db.Orders.Include(_ => _.Products).AsNoTracking().Where(_ => _.CustomerName != bannedCustomerName);
 
-            return await result.ToListAsync();
+            if ((from != null && to != null))
+            {
+                filter = filter.Where(res => res.CreatedDate >= DbFunctions.TruncateTime(from)
+                    && res.CreatedDate < DbFunctions.TruncateTime(to));
+            }
+            if (customerName != null)
+            {
+                filter = filter.Where(res => res.CustomerName == customerName);
+            }
+
+            return await filter.ToListAsync();
         }
+
+        //public async Task<IEnumerable<Order>> OrderFilterAsync(DateTime? from, DateTime? to, string customerName)
+        //{
+        //    if ((from != null && to != null)  && (DateTime.Compare(from.Value, to.Value) > 0))
+        //        throw new ArgumentOutOfRangeException($"{nameof(to)} date can't be earlier than {nameof(from)}");
+
+        //    IQueryable<Order> result = FilterByCustomer();
+        //    //if (from != null && to != null)
+        //    //    result = result.Union(FilterByDate(from.Value, to.Value)); //todo: << Union remove
+
+        //    //if (customerName != null)
+        //    //    result = result.Union(FilterByCustomer(customerName)); //todo: << Union remove
+
+        //    return await result.ToListAsync();
+        //}
 
         public async Task<int> UpdateOrCreateOrderAsync(Order order)
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,7 +10,7 @@ namespace WebApplicationExercise.Models
         [Key]
         public int Id { get; set; }
 
-        public double CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
 
         public string CustomerName { get; set; }
 

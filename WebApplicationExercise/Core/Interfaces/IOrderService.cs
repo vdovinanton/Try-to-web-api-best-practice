@@ -29,7 +29,7 @@ namespace WebApplicationExercise.Core.Interfaces
         /// <param name="to">End date</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="order"/> Id is null</exception>
         /// <returns></returns>
-        Task<IEnumerable<Order>> OrderFilterAsync(DateTime from, DateTime to, string customerName);
+        Task<IEnumerable<Order>> OrderFilterAsync(DateTime? from, DateTime? to, string customerName);
 
         /// <summary>
         /// Modify current <see cref="Order"/>

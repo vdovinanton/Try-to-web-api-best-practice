@@ -11,7 +11,6 @@ namespace WebApplicationExercise.Utils
     public class ExecutionTimeAttribute : ActionFilterAttribute
     {
         private const string StartTimeKey = "StartTime";
-        //private const string CorrelationIdKey = "CorrelationId";
         private readonly NLog.Logger _logger = LogManager.GetCurrentClassLogger();
 
         public override Task OnActionExecutingAsync(HttpActionContext actionContext,
@@ -23,10 +22,7 @@ namespace WebApplicationExercise.Utils
                     .ConvertToUnixTimestamp();
 
                 actionContext.Request.Properties.Add(StartTimeKey, timestamp);
-                //actionContext.Request.Properties.Add(CorrelationIdKey, correlationId);
-
-                //Logger.Instance.Information($"Executing request: {actionContext.ControllerContext.Request.Method.Method} " + 
-                //    $" {actionContext.ControllerContext.Request.RequestUri.AbsolutePath};");
+                
                 _logger.Info($"Executing request: {actionContext.ControllerContext.Request.Method.Method} " +
                     $" {actionContext.ControllerContext.Request.RequestUri.AbsolutePath};");
             });
@@ -37,9 +33,6 @@ namespace WebApplicationExercise.Utils
         {
             return Task.Run(() => {
                 double timestamp = default(double);
-                //string correlectionId = actionExecutedContext.Request.Properties.ContainsKey(CorrelationIdKey) ?
-                //    actionExecutedContext.Request.Properties[CorrelationIdKey].ToString() :
-                //    string.Empty;
 
                 if (actionExecutedContext.Request.Properties.ContainsKey(StartTimeKey))
                 {
@@ -52,8 +45,6 @@ namespace WebApplicationExercise.Utils
 
                 if (actionExecutedContext.Response != null)
                 {
-                    //Logger.Instance.Information($"Executed request {actionExecutedContext.Request.Method.Method} {actionExecutedContext.Request.RequestUri.AbsolutePath} " +
-                    //    $" - Time taken: {timestamp.ToString()}ms;");
                     _logger.Info($"Executed request {actionExecutedContext.Request.Method.Method} {actionExecutedContext.Request.RequestUri.AbsolutePath} " +
                         $" - Time taken: {timestamp.ToString()}ms;");
                 }

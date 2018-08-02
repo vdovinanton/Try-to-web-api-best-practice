@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System;
 using WebApplicationExercise.Models;
 using WebApplicationExercise.ViewModels;
 
@@ -10,10 +11,11 @@ namespace WebApplicationExercise.Utils.Mapping
         {
             CreateMap<OrderViewModel, Order>()
                 .ForMember(m => m.CustomerName, e => e.MapFrom(o => o.Customer))
-                .ForMember(q => q.CreatedDate, w => w.MapFrom(r => r.CreatedDate.ConvertFromStringToUnix()));
+                .ForMember(q => q.CreatedDate, w => w.MapFrom(r => r.CreatedDate.ConvertToDateTimeUtc()));
 
             CreateMap<Order, OrderViewModel>()
-                .ForMember(q => q.CreatedDate, w => w.MapFrom(r => r.CreatedDate.ConvertFromUnixToStringUtc()));
+                .ForMember(m => m.Customer, e => e.MapFrom(q => q.CustomerName))
+                .ForMember(q => q.CreatedDate, w => w.MapFrom(r => r.CreatedDate.ConvertToStringUtc()));
 
             CreateMap<ProductViewModel, Product>()
                 .ForMember(x => x.OrderId, opt => opt.Ignore())
