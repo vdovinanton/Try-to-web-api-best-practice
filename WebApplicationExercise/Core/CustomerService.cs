@@ -1,5 +1,4 @@
 ﻿using WebApplicationExercise.Core.Interfaces;
-using WebApplicationExercise.Models;
 using WebApplicationExercise.Utils;
 
 namespace WebApplicationExercise.Core
@@ -10,6 +9,12 @@ namespace WebApplicationExercise.Core
         {
             swap = Settings.Instance.CustomerName;
             return customerName != swap;
+        }
+
+        public bool IsCustomerVisible(string customerName)
+        {
+            string swap;
+            return IsCustomerVisible(customerName, out swap);
         }
     }
 }

@@ -4,12 +4,8 @@ using System.Linq;
 using WebApplicationExercise.Models;
 using System.Data.Entity;
 using System.Threading.Tasks;
-using WebApplicationExercise.Utils;
 using WebApplicationExercise.Core.Interfaces;
 using NLog;
-using System.Linq.Expressions;
-using Antlr.Runtime.Misc;
-using NJection.LambdaConverter.Fluent;
 
 namespace WebApplicationExercise.Core
 {
@@ -18,7 +14,7 @@ namespace WebApplicationExercise.Core
         private readonly DataContext _db;
         private readonly ICustomerService _customerService;
 
-        private readonly NLog.Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public OrderService(DataContext db, ICustomerService customerService)
         {
@@ -32,14 +28,12 @@ namespace WebApplicationExercise.Core
                 .AsNoTracking()
                 .Include(o => o.Products)
                 .ToListAsync();
-            //Logger.Instance.Information($"Get all orders [{result.Count()}]");
             _logger.Info($"Get all orders [{result.Count()}]");
             return result;
         }
 
         public async Task<Order> GetByIdAsync(int orderId)
         {
-            //Logger.Instance.Information($"Get order by Id - {orderId}");
             _logger.Info($"Get order by Id - {orderId}");
             return await _db.Orders
                 .AsNoTracking()
@@ -47,45 +41,23 @@ namespace WebApplicationExercise.Core
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
-        //private IQueryable<Order> FilterByCustomer(Expression<Func<Order, bool>> predicate)
-        private IQueryable<Order> FilterByCustomer()
-        {
-            //Logger.Instance.Information($"Filtered orders by customer {Settings.Instance.CustomerName}");
-            _logger.Info($"Filtered orders by customer {Settings.Instance.CustomerName}");
-
-            //var lambda = Lambda.TransformMethodTo<System.Func<Order, bool>>()
-            //                   .From(() => _customerService.IsCustomerVisible)
-            //                   .ToLambda();
-
-
-
-            //return _db.Orders
-            //    .AsNoTracking()
-            //    .Include(q => q.Products)
-            //    //.Select(q => lambda(q.CustomerName));
-            //    .Where(lambda);
-            //.Where(predicate); //o => _customerService.IsCustomerVisible(o.CustomerName)
-            return null;
-        }
         private IQueryable<Order> FilterByCustomer(string customerName)
         {
-            //Logger.Instance.Information($"Filtered orders by customer {customerName}");
             _logger.Info($"Filtered orders by customer {customerName}");
             return _db.Orders
                 .AsNoTracking()
                 .Where(o => o.CustomerName == customerName);
         }
 
-        //private IQueryable<Order> FilterByDate(DateTime from, DateTime to)
-        //{
-        //    //Logger.Instance.Information($"Filtered orders by date");
-        //    _logger.Info($"Filtered orders by date");
-        //    return _db.Orders
-        //        .AsNoTracking()
-        //        .Where(o => o.CreatedDate.ConvertFromUnixTimestamp() >= DbFunctions.TruncateTime(from) && o.CreatedDate.ConvertFromUnixTimestamp() < DbFunctions.TruncateTime(to));
-        //}
-
-        public async Task<IEnumerable<Order>> OrderFilterAsync(DateTime? from, DateTime? to, string customerName)
+        public async Task<IEnumerable<Order>> OrderFilterAsync(
+            int startFrom,
+            int pageSize,
+            string currency,
+            DateTime? from,
+            DateTime? to,
+            string customerName, 
+            string sortby
+            )
         {
             if ((from != null && to != null) && (DateTime.Compare(from.Value, to.Value) > 0))
                 throw new ArgumentOutOfRangeException($"{nameof(to)} date can't be earlier than {nameof(from)}");
@@ -93,35 +65,61 @@ namespace WebApplicationExercise.Core
             string bannedCustomerName = string.Empty;
             _customerService.IsCustomerVisible(customerName, out bannedCustomerName);
 
-            IQueryable<Order> filter = _db.Orders.Include(_ => _.Products).AsNoTracking().Where(_ => _.CustomerName != bannedCustomerName);
+            IQueryable<Order> query = _db.Orders
+                .Include(_ => _.Products)
+                .Where(_ => _.CustomerName != bannedCustomerName);
+
+            // by default newest orders in the top
+            query = SortBy(sortby, query);
 
             if ((from != null && to != null))
             {
-                filter = filter.Where(res => res.CreatedDate >= DbFunctions.TruncateTime(from)
+                _logger.Info($"Filtered orders by date");
+                query = query.Where(res => res.CreatedDate >= DbFunctions.TruncateTime(from)
                     && res.CreatedDate < DbFunctions.TruncateTime(to));
             }
             if (customerName != null)
             {
-                filter = filter.Where(res => res.CustomerName == customerName);
+                _logger.Info($"Filtered orders by customer {customerName}");
+                query = query.Where(res => res.CustomerName == customerName);
             }
 
-            return await filter.ToListAsync();
+            if (startFrom >= 0 && pageSize > 0)
+                query = query
+                    .Skip(() => startFrom)
+                    .Take(() => pageSize);
+
+            _logger.Info($"Taken orders {pageSize} started from {startFrom}");
+            return await query
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-        //public async Task<IEnumerable<Order>> OrderFilterAsync(DateTime? from, DateTime? to, string customerName)
-        //{
-        //    if ((from != null && to != null)  && (DateTime.Compare(from.Value, to.Value) > 0))
-        //        throw new ArgumentOutOfRangeException($"{nameof(to)} date can't be earlier than {nameof(from)}");
+        private IQueryable<Order> SortBy(string sort, IQueryable<Order> query)
+        {
+            sort = sort.ToLower();
 
-        //    IQueryable<Order> result = FilterByCustomer();
-        //    //if (from != null && to != null)
-        //    //    result = result.Union(FilterByDate(from.Value, to.Value)); //todo: << Union remove
+            if (sort.IndexOf("customer_name") != -1)
+            {
+                query = query
+                    .OrderBy(_ => _.CustomerName);
+            }
+            else
+            if (sort.IndexOf("order_date") != -1)
+            {
+                query = query
+                    .OrderByDescending(_ => _.CreatedDate);
+            }
+            else
+            if (sort.IndexOf("order_amount") != -1)
+            {
+                query = query
+                    .OrderByDescending(_ => _.Products.Sum(p => p.Price));
+            }
 
-        //    //if (customerName != null)
-        //    //    result = result.Union(FilterByCustomer(customerName)); //todo: << Union remove
-
-        //    return await result.ToListAsync();
-        //}
+            _logger.Info($"Orders filtered by {sort}");
+            return query;
+        }
 
         public async Task<int> UpdateOrCreateOrderAsync(Order order)
         {
@@ -132,7 +130,6 @@ namespace WebApplicationExercise.Core
             if (!_db.Orders.AsNoTracking().Any(_ => _.Id == order.Id))
             {
                 _db.Orders.Add(order);
-                //Logger.Instance.Information($"Added orderId - {order.Id} with {order.Products.Count} products");
                 _logger.Info($"Added orderId - {order.Id} with {order.Products.Count} products");
             }
             else
@@ -141,7 +138,6 @@ namespace WebApplicationExercise.Core
                 foreach(var product in order.Products)
                     _db.Entry(product).State = EntityState.Modified;
 
-                //Logger.Instance.Information($"Modified orderId - {order.Id} with {order.Products.Count} products");
                 _logger.Info($"Modified orderId - {order.Id} with {order.Products.Count} products");
             }
 
@@ -158,7 +154,6 @@ namespace WebApplicationExercise.Core
                 var order = GetByIdAsync(orderId);
                 _db.Entry(order).State = EntityState.Deleted;
                 await _db.SaveChangesAsync();
-                //Logger.Instance.Information($"Remove order Id - {order.Id}");
                 _logger.Info($"Remove order Id - {order.Id}");
             }
             else

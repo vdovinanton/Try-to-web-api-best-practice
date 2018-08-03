@@ -71,6 +71,7 @@ namespace WebApplicationExercise.Utils
                 Bind<DataContext>().ToSelf().InRequestScope();
                 Bind<IOrderService>().To<OrderService>();
                 Bind<ICustomerService>().To<CustomerService>();
+                Bind<ICurrencyService>().To<CurrencyService>();
 
                 var mapperConfiguration = CreateConfiguration();
                 Bind<MapperConfiguration>().ToConstant(mapperConfiguration).InSingletonScope();

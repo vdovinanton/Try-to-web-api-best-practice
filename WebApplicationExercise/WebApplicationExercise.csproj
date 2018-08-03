@@ -231,7 +231,9 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Core\CurrencyService.cs" />
     <Compile Include="Core\CustomerService.cs" />
+    <Compile Include="Core\Interfaces\ICurrencyService.cs" />
     <Compile Include="Core\Interfaces\ICustomerService.cs" />
     <Compile Include="Core\Interfaces\IOrderService.cs" />
     <Compile Include="Utils\Extensions.cs" />

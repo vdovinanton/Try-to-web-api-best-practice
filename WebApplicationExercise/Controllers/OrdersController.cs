@@ -6,26 +6,32 @@ using WebApplicationExercise.Models;
 using WebApplicationExercise.Core.Interfaces;
 using WebApplicationExercise.ViewModels;
 using AutoMapper;
+using System.Linq;
 
 namespace WebApplicationExercise.Controllers
 {
-    [RoutePrefix("api/v1/orders")]
+    [RoutePrefix("api/v1/orders/{currency}")]
     public class OrdersController : ApiController
     {
-        private readonly IOrderService _orderService;
+        private const string CURRENCY = "USD";
+
         private readonly IMapper _mapper;
-        public OrdersController(IOrderService orderService, IMapper mapper)
+        private readonly IOrderService _orderService;
+        private readonly ICurrencyService _currencyService;
+        public OrdersController(IOrderService orderService, IMapper mapper, ICurrencyService currencyService)
         {
-            _orderService = orderService;
             _mapper = mapper;
+            _orderService = orderService;
+            _currencyService = currencyService;
         }
         
         [HttpGet]
         [Route("{orderId}")]
-        public async Task<OrderViewModel> GetOrder(int orderId)
+        // dont know why second paramether is requred
+        public async Task<OrderViewModel> GetOrder(int orderId, string currency = null)
         {
-            var order = await _orderService.GetByIdAsync(orderId);
-            return _mapper.Map<OrderViewModel>(order); ;
+            var order = await _orderService.GetByIdAsync(0);
+            return _mapper.Map<OrderViewModel>(order);
         }
         
         [HttpPut]
@@ -36,16 +42,26 @@ namespace WebApplicationExercise.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<OrderViewModel>> GetOrders(DateTime? from = null, DateTime? to = null, string customerName = null)
+        public async Task<IEnumerable<OrderViewModel>> GetOrders(
+            int startFrom = 0,
+            int pageSize = 0,
+            string currency = null,
+            DateTime? from = null, 
+            DateTime? to = null, 
+            string customerName = null, 
+            string sortby = "order_date"
+            )
         {
-            //IEnumerable<Order> orders;
+            var orders = await _orderService.OrderFilterAsync(startFrom, pageSize, currency, from, to, customerName, sortby);
 
-            //if ((from == null && to == null) && customerName == null)
-            //    orders = await _orderService.GetAllAsync();
-            //else
-            //    orders = await _orderService.OrderFilterAsync(from, to, customerName);
+            if (!string.IsNullOrEmpty(currency))
+            {
+                var currencyKey = $"USD_{currency}";
+                var currencyRate = await _currencyService.GetCurrency(currency);
 
-            var orders = await _orderService.OrderFilterAsync(from, to, customerName);
+                foreach (var product in orders.SelectMany(_ => _.Products))
+                    product.Price *= currencyRate[currencyKey];
+            }
 
             return _mapper.Map<IEnumerable<OrderViewModel>>(orders);
         }
