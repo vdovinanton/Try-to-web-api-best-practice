@@ -69,7 +69,6 @@ namespace WebApplicationExercise.Core
                 .Include(_ => _.Products)
                 .Where(_ => _.CustomerName != bannedCustomerName);
 
-            // by default newest orders in the top
             query = SortBy(sortby, query);
 
             if ((from != null && to != null))
@@ -99,23 +98,23 @@ namespace WebApplicationExercise.Core
         {
             sort = sort.ToLower();
 
-            if (sort.IndexOf("customer_name") != -1)
-            {
+            // sort by default if sort wasnt requried
+            if (string.IsNullOrEmpty(sort))
                 query = query
                     .OrderBy(_ => _.CustomerName);
-            }
+
+
+            if (sort.IndexOf("customer_name") != -1)
+                query = query
+                    .OrderBy(_ => _.CustomerName);
             else
             if (sort.IndexOf("order_date") != -1)
-            {
                 query = query
                     .OrderByDescending(_ => _.CreatedDate);
-            }
             else
             if (sort.IndexOf("order_amount") != -1)
-            {
                 query = query
                     .OrderByDescending(_ => _.Products.Sum(p => p.Price));
-            }
 
             _logger.Info($"Orders filtered by {sort}");
             return query;

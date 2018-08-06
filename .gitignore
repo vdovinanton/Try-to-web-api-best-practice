@@ -34,7 +34,7 @@ x64/
 *_p.c
 *.ilk
 *.meta
-*.obj
+.obj
 *.pch
 *.pdb
 *.pgc
@@ -158,9 +158,9 @@ UpgradeLog*.htm
 *.orig
 
 # SQL Server files
-**/App_Data/*.mdf
-**/App_Data/*.ldf
-**/App_Data/*.sdf
+/App_Data/*.mdf
+/App_Data/*.ldf
+/App_Data/*.sdf
 
 
 #LightSwitch generated files
@@ -194,8 +194,13 @@ $RECYCLE.BIN/
 # Visual Studio temp something
 .vs/
 .packages/
-.WebApplicationExercise/log/
+.WebApplicationExercise/logs/
 .WebApplicationExercise/App_Data/
+.WebApplicationExercise/obj/
+.WebApplicationExercise/bin/
+.obj/
+.bin/
+.App_Data/
 
 # dotnet stuff
 project.lock.json

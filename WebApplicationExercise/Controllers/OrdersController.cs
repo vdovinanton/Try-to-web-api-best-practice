@@ -49,7 +49,7 @@ namespace WebApplicationExercise.Controllers
             DateTime? from = null, 
             DateTime? to = null, 
             string customerName = null, 
-            string sortby = "order_date"
+            string sortby = null
             )
         {
             var orders = await _orderService.OrderFilterAsync(startFrom, pageSize, currency, from, to, customerName, sortby);
