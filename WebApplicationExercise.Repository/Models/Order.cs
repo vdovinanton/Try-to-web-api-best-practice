@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WebApplicationExercise.Models
+namespace WebApplicationExercise.Repository.Models
 {
     public class Order
     {

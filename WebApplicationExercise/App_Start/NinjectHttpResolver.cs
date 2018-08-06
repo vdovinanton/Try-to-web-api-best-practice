@@ -10,6 +10,10 @@ using System.Web.Http;
 using System.Web.Http.Dependencies;
 using WebApplicationExercise.Core;
 using WebApplicationExercise.Core.Interfaces;
+using WebApplicationExercise.Repository;
+using WebApplicationExercise.Repository.Interfaces;
+using WebApplicationExercise.Repository.Models;
+using WebApplicationExercise.Repository.Repositories;
 
 namespace WebApplicationExercise.Utils
 {
@@ -69,6 +73,8 @@ namespace WebApplicationExercise.Utils
             {
                 //TODO: Bind to Concrete Types
                 Bind<DataContext>().ToSelf().InRequestScope();
+                Bind<IOrderRepository>().To<OrderRepository>();
+                Bind(typeof(IRepository<>)).To(typeof(Repository<>));
                 Bind<IOrderService>().To<OrderService>();
                 Bind<ICustomerService>().To<CustomerService>();
                 Bind<ICurrencyService>().To<CurrencyService>();

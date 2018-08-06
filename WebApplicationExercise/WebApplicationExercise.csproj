@@ -52,9 +52,11 @@
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
@@ -237,20 +239,16 @@
     <Compile Include="Core\Interfaces\ICustomerService.cs" />
     <Compile Include="Core\Interfaces\IOrderService.cs" />
     <Compile Include="Utils\Extensions.cs" />
-    <Compile Include="Core\DataContext.cs" />
     <Compile Include="Core\OrderService.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\ExceptionLog.cs" />
-    <Compile Include="Models\Order.cs" />
-    <Compile Include="Models\Product.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\ExecutionTimeAttribute.cs" />
     <Compile Include="Utils\ExceptionHandler.cs" />
     <Compile Include="App_Start\NinjectHttpResolver.cs" />
     <Compile Include="Utils\Mapping\MappingProfile.cs" />
-    <Compile Include="Utils\NinjectResolver.cs" />
     <Compile Include="Utils\Settings.cs" />
     <Compile Include="ViewModels\OrderViewModel.cs" />
     <Compile Include="ViewModels\ProductViewModel.cs" />
@@ -346,6 +344,12 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WebApplicationExercise.Repository\WebApplicationExercise.Repository.csproj">
+      <Project>{35e31087-b16d-4642-8be1-ea13d29836c3}</Project>
+      <Name>WebApplicationExercise.Repository</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

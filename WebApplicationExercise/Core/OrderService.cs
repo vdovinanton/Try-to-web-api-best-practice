@@ -1,164 +1,122 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WebApplicationExercise.Models;
-using System.Data.Entity;
 using System.Threading.Tasks;
 using WebApplicationExercise.Core.Interfaces;
 using NLog;
+using WebApplicationExercise.Repository.Interfaces;
+using WebApplicationExercise.ViewModels;
+using AutoMapper;
+using WebApplicationExercise.Repository.Models;
+using System.Data.Entity;
 
 namespace WebApplicationExercise.Core
 {
     public class OrderService: IOrderService
     {
-        private readonly DataContext _db;
         private readonly ICustomerService _customerService;
+        private readonly IOrderRepository _repository;
+        private readonly IMapper _mapper;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public OrderService(DataContext db, ICustomerService customerService)
+        public OrderService(ICustomerService customerService, IOrderRepository orderRepository, IMapper mapper)
         {
-            _db = db;
             _customerService = customerService;
+            _repository = orderRepository;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Order>> GetAllAsync()
+        public async Task<List<OrderViewModel>> GetAllAsync()
         {
-            var result = await _db.Orders
-                .AsNoTracking()
-                .Include(o => o.Products)
-                .ToListAsync();
-            _logger.Info($"Get all orders [{result.Count()}]");
-            return result;
+            var result = await _repository
+                .GetAllAsync();
+            _logger.Info($"Get all orders [{result.Count}]");
+            return _mapper.Map<List<OrderViewModel>>(result);
         }
 
-        public async Task<Order> GetByIdAsync(int orderId)
+        public async Task<OrderViewModel> GetByIdAsync(int orderId)
         {
             _logger.Info($"Get order by Id - {orderId}");
-            return await _db.Orders
-                .AsNoTracking()
-                .Include(o => o.Products)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+            var order = await _repository.GetWithProductsAsync(orderId);
+            return _mapper.Map<OrderViewModel>(order);
         }
 
-        private IQueryable<Order> FilterByCustomer(string customerName)
-        {
-            _logger.Info($"Filtered orders by customer {customerName}");
-            return _db.Orders
-                .AsNoTracking()
-                .Where(o => o.CustomerName == customerName);
-        }
-
-        public async Task<IEnumerable<Order>> OrderFilterAsync(
+        public async Task<IEnumerable<OrderViewModel>> OrderFilterAsync(
             int startFrom,
             int pageSize,
             string currency,
             DateTime? from,
             DateTime? to,
-            string customerName, 
+            string customerName,
             string sortby
             )
         {
-            if ((from != null && to != null) && (DateTime.Compare(from.Value, to.Value) > 0))
-                throw new ArgumentOutOfRangeException($"{nameof(to)} date can't be earlier than {nameof(from)}");
+            //if ((from != null && to != null) && (DateTime.Compare(from.Value, to.Value) > 0))
+            //    throw new ArgumentOutOfRangeException($"{nameof(to)} date can't be earlier than {nameof(from)}");
 
             string bannedCustomerName = string.Empty;
             _customerService.IsCustomerVisible(customerName, out bannedCustomerName);
 
-            IQueryable<Order> query = _db.Orders
-                .Include(_ => _.Products)
-                .Where(_ => _.CustomerName != bannedCustomerName);
+            // create query
+            var query = _repository
+                .Find(_ => _.CustomerName != bannedCustomerName, null, sortby);
 
-            query = SortBy(sortby, query);
-
+            // filtering
             if ((from != null && to != null))
             {
                 _logger.Info($"Filtered orders by date");
-                query = query.Where(res => res.CreatedDate >= DbFunctions.TruncateTime(from)
-                    && res.CreatedDate < DbFunctions.TruncateTime(to));
+                query = _repository.Find(_ => _.CreatedDate >= DbFunctions.TruncateTime(from) 
+                    && _.CreatedDate < DbFunctions.TruncateTime(to), query);
             }
             if (customerName != null)
             {
                 _logger.Info($"Filtered orders by customer {customerName}");
-                query = query.Where(res => res.CustomerName == customerName);
+                query = _repository.Find(_ => _.CustomerName == customerName, query);
             }
 
-            if (startFrom >= 0 && pageSize > 0)
-                query = query
-                    .Skip(() => startFrom)
-                    .Take(() => pageSize);
-
-            _logger.Info($"Taken orders {pageSize} started from {startFrom}");
-            return await query
+            // paginate
+            if (startFrom >= 0 && pageSize >= 1)
+            {
+                query = _repository
+                    .Paginate(startFrom, pageSize, query);
+                _logger.Info($"Paginated orders {pageSize} started from {startFrom}");
+            }
+            
+            var result = await query
                 .AsNoTracking()
                 .ToListAsync();
+            _logger.Info($"Total taken orders {result.Count}");
+
+            return _mapper.Map<List<OrderViewModel>>(result);
         }
 
-        private IQueryable<Order> SortBy(string sort, IQueryable<Order> query)
+
+        public async Task<int> UpdateOrCreateOrderAsync(OrderViewModel order)
         {
-            sort = sort.ToLower();
+            var mappedOrder = _mapper.Map<Order>(order);
 
-            // sort by default if sort wasnt requried
-            if (string.IsNullOrEmpty(sort))
-                query = query
-                    .OrderBy(_ => _.CustomerName);
-
-
-            if (sort.IndexOf("customer_name") != -1)
-                query = query
-                    .OrderBy(_ => _.CustomerName);
-            else
-            if (sort.IndexOf("order_date") != -1)
-                query = query
-                    .OrderByDescending(_ => _.CreatedDate);
-            else
-            if (sort.IndexOf("order_amount") != -1)
-                query = query
-                    .OrderByDescending(_ => _.Products.Sum(p => p.Price));
-
-            _logger.Info($"Orders filtered by {sort}");
-            return query;
-        }
-
-        public async Task<int> UpdateOrCreateOrderAsync(Order order)
-        {
-            var originalOrder = _db.Orders
-                .AsNoTracking()
-                .FirstOrDefault(_ => _.Id == order.Id);
-
-            if (!_db.Orders.AsNoTracking().Any(_ => _.Id == order.Id))
+            if (!await _repository.AnyAsync(order.Id))
             {
-                _db.Orders.Add(order);
-                _logger.Info($"Added orderId - {order.Id} with {order.Products.Count} products");
+                _repository.Add(mappedOrder);
+                _logger.Info($"Added order with {order.Products.Count} products");
             }
             else
             {
-                _db.Entry(order).State = EntityState.Modified;
-                foreach(var product in order.Products)
-                    _db.Entry(product).State = EntityState.Modified;
-
+                _repository.Update(mappedOrder);
                 _logger.Info($"Modified orderId - {order.Id} with {order.Products.Count} products");
             }
 
-            await _db.SaveChangesAsync();
+            await _repository.CompleteAsync();
 
-            return order.Id;
+            return mappedOrder.Id;
         }
-
 
         public async Task RemoveAsync(int orderId)
         {
-            if (!Equals(orderId, default(int)))
-            {
-                var order = GetByIdAsync(orderId);
-                _db.Entry(order).State = EntityState.Deleted;
-                await _db.SaveChangesAsync();
-                _logger.Info($"Remove order Id - {order.Id}");
-            }
-            else
-            {
-                throw new ArgumentNullException($"{nameof(orderId)} can't be empty");
-            }
+            var order = await _repository.GetAsync(orderId);
+            _repository.Remove(order);
+            await _repository.CompleteAsync();
         }
     }
 }

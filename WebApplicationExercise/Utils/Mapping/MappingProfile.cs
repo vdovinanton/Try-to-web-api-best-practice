@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using System;
-using WebApplicationExercise.Models;
+using WebApplicationExercise.Repository.Models;
 using WebApplicationExercise.ViewModels;
 
 namespace WebApplicationExercise.Utils.Mapping
@@ -18,7 +18,6 @@ namespace WebApplicationExercise.Utils.Mapping
                 .ForMember(q => q.CreatedDate, w => w.MapFrom(r => r.CreatedDate.ConvertToStringUtc()));
 
             CreateMap<ProductViewModel, Product>()
-                .ForMember(x => x.OrderId, opt => opt.Ignore())
                 .ForMember(x => x.Order, opt => opt.Ignore());
         }
     }

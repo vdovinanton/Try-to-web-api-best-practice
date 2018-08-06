@@ -1,0 +1,31 @@
+2018-08-06 18:45:47.5840 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 8000008f-0004-eb00-b63f-84710c7967bb | Executed request GET /api/Orders  - Time taken: 589.6085ms;
+2018-08-06 18:45:56.4309 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 69d3d4a0-ca2f-4495-9037-220e1445067c | Executing request: GET  /api/Orders;
+2018-08-06 18:46:10.2706 | WebApplicationExercise.Core.OrderService | 80000090-0004-eb00-b63f-84710c7967bb | Total taken orders 8
+2018-08-06 18:46:10.2706 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 80000090-0004-eb00-b63f-84710c7967bb | Executed request GET /api/Orders  - Time taken: 14271.1845ms;
+2018-08-06 18:46:19.0468 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 919ab235-738c-4488-9b8c-b73b74c1e4bd | Executing request: GET  /api/Orders;
+2018-08-06 18:46:35.9163 | WebApplicationExercise.Core.OrderService | 80000091-0004-eb00-b63f-84710c7967bb | Total taken orders 8
+2018-08-06 18:46:35.9163 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 80000091-0004-eb00-b63f-84710c7967bb | Executed request GET /api/Orders  - Time taken: 16917.8502ms;
+2018-08-06 18:46:35.9263 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 795d713e-b6c0-42a8-90d4-d1c5ffa85351 | Executing request: GET  /api/Orders;
+2018-08-06 18:46:37.3919 | WebApplicationExercise.Core.OrderService | 80000092-0004-eb00-b63f-84710c7967bb | Total taken orders 8
+2018-08-06 18:46:37.3919 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 80000092-0004-eb00-b63f-84710c7967bb | Executed request GET /api/Orders  - Time taken: 2392.9337ms;
+2018-08-06 18:46:42.9420 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 11909a8e-cfcb-41f2-848d-4ec9c3addeec | Executing request: GET  /api/Orders;
+2018-08-06 18:47:18.1789 | WebApplicationExercise.Utils.ExceptionHandler | 80000093-0004-eb00-b63f-84710c7967bb | GET /api/Orders - ArgumentOutOfRangeException - Specified argument was out of the range of valid values.  Parameter name: to date can't be earlier than from 
+2018-08-06 18:47:20.4238 | WebApplicationExercise.Utils.ExecutionTimeAttribute | ac5104a1-349b-49d4-abae-ef14c5690839 | Executing request: GET  /api/Orders;
+2018-08-06 18:47:23.4878 | WebApplicationExercise.Core.OrderService | 80000094-0004-eb00-b63f-84710c7967bb | Filtered orders by date
+2018-08-06 18:47:23.4978 | WebApplicationExercise.Core.OrderService | 80000094-0004-eb00-b63f-84710c7967bb | Total taken orders 0
+2018-08-06 18:47:23.4978 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 80000094-0004-eb00-b63f-84710c7967bb | Executed request GET /api/Orders  - Time taken: 3498.8436ms;
+2018-08-06 18:47:45.2969 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 3cce93ae-0ec4-40ea-b230-a992d8705dc0 | Executing request: GET  /api/Orders;
+2018-08-06 18:47:52.1135 | WebApplicationExercise.Core.OrderService | 80000095-0004-eb00-b63f-84710c7967bb | Filtered orders by date
+2018-08-06 18:47:52.1215 | WebApplicationExercise.Core.OrderService | 80000095-0004-eb00-b63f-84710c7967bb | Total taken orders 0
+2018-08-06 18:47:52.1215 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 80000095-0004-eb00-b63f-84710c7967bb | Executed request GET /api/Orders  - Time taken: 7121.5643ms;
+2018-08-06 18:47:57.8728 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 8dae68db-d6a7-42e7-b249-71d987584a79 | Executing request: GET  /api/Orders;
+2018-08-06 18:47:59.5845 | WebApplicationExercise.Core.OrderService | 80000096-0004-eb00-b63f-84710c7967bb | Filtered orders by date
+2018-08-06 18:47:59.5845 | WebApplicationExercise.Core.OrderService | 80000096-0004-eb00-b63f-84710c7967bb | Total taken orders 0
+2018-08-06 18:48:38.6682 | WebApplicationExercise.WebApiApplication |  | Application started
+2018-08-06 18:48:39.0332 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 0ad3f108-fd7a-43b4-b1e8-4d6f4bcfa8dd | Executing request: GET  /api/Orders;
+2018-08-06 18:48:52.1964 | WebApplicationExercise.Utils.ExceptionHandler | 800000aa-0004-eb00-b63f-84710c7967bb | GET /api/Orders - ArgumentOutOfRangeException - Specified argument was out of the range of valid values.  Parameter name: to date can't be earlier than from 
+2018-08-06 18:50:02.2884 | WebApplicationExercise.WebApiApplication |  | Application started
+2018-08-06 18:50:06.3660 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 812545e7-2a8c-4fe4-aa7f-cd6bbf71f250 | Executing request: GET  /api/Orders;
+2018-08-06 18:50:08.4392 | WebApplicationExercise.Core.OrderService | 800002b0-0005-f700-b63f-84710c7967bb | Filtered orders by date
+2018-08-06 18:50:08.4705 | WebApplicationExercise.Core.OrderService | 800002b0-0005-f700-b63f-84710c7967bb | Total taken orders 0
+2018-08-06 18:50:08.4856 | WebApplicationExercise.Utils.ExecutionTimeAttribute | 800002b0-0005-f700-b63f-84710c7967bb | Executed request GET /api/Orders  - Time taken: 2485.6235ms;

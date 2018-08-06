@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity;
-using WebApplicationExercise.Models;
+using WebApplicationExercise.Repository.Models;
 
-namespace WebApplicationExercise.Core
+namespace WebApplicationExercise.Repository
 {
     public class DataContext : DbContext
     {
