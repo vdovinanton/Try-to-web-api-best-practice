@@ -61,16 +61,6 @@ namespace WebApplicationExercise.Controllers
         {
             var orders = await _orderService.OrderFilterAsync(startFrom, pageSize, currency, from, to, customerName, sortby);
 
-            //if (!string.IsNullOrEmpty(currency))
-            //{
-            //    var currencyKey = $"USD_{currency}";
-            //    var currencyRate = await _currencyService.GetCurrency(currency);
-
-            //    foreach (var product in orders.SelectMany(_ => _.Products))
-            //        product.Price *= currencyRate[currencyKey];
-            //}
-
-            //return _mapper.Map<IEnumerable<OrderViewModel>>(orders);
             return orders;
         }
 

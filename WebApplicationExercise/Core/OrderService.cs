@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using WebApplicationExercise.Core.Interfaces;
 using NLog;
@@ -14,17 +13,19 @@ namespace WebApplicationExercise.Core
 {
     public class OrderService: IOrderService
     {
-        private readonly ICustomerService _customerService;
-        private readonly IOrderRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IOrderRepository _repository;
+        private readonly ICustomerService _customerService;
+        private readonly ICurrencyService _currencyService;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public OrderService(ICustomerService customerService, IOrderRepository orderRepository, IMapper mapper)
+        public OrderService(ICustomerService customerService, IOrderRepository orderRepository, ICurrencyService currencyService, IMapper mapper)
         {
-            _customerService = customerService;
-            _repository = orderRepository;
             _mapper = mapper;
+            _repository = orderRepository;
+            _customerService = customerService;
+            _currencyService = currencyService;
         }
 
         public async Task<List<OrderViewModel>> GetAllAsync()
@@ -52,10 +53,8 @@ namespace WebApplicationExercise.Core
             string sortby
             )
         {
-            //if ((from != null && to != null) && (DateTime.Compare(from.Value, to.Value) > 0))
-            //    throw new ArgumentOutOfRangeException($"{nameof(to)} date can't be earlier than {nameof(from)}");
 
-            string bannedCustomerName = string.Empty;
+            string bannedCustomerName;
             _customerService.IsCustomerVisible(customerName, out bannedCustomerName);
 
             // create query
@@ -82,10 +81,14 @@ namespace WebApplicationExercise.Core
                     .Paginate(startFrom, pageSize, query);
                 _logger.Info($"Paginated orders {pageSize} started from {startFrom}");
             }
-            
+
             var result = await query
                 .AsNoTracking()
                 .ToListAsync();
+
+            if(!string.IsNullOrEmpty(currency))
+                result = await _currencyService.ConvertAsync(result, currency);
+
             _logger.Info($"Total taken orders {result.Count}");
 
             return _mapper.Map<List<OrderViewModel>>(result);

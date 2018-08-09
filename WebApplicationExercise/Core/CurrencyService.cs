@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebApplicationExercise.Core.Interfaces;
+using WebApplicationExercise.Repository.Models;
 
 namespace WebApplicationExercise.Core
 {
@@ -18,6 +20,17 @@ namespace WebApplicationExercise.Core
                 string responseBody = await client.GetStringAsync(uri);
                 return JsonConvert.DeserializeObject<Dictionary<string, double>>(responseBody);
             }
+        }
+
+        public async Task<List<Order>> ConvertAsync(List<Order> orders, string currency)
+        {
+            var currencyKey = $"USD_{currency}";
+            var currencyRate = await GetCurrency(currency);
+
+            foreach (var product in orders.SelectMany(_ => _.Products))
+                product.Price *= Math.Round(currencyRate[currencyKey], 3);
+
+            return orders;
         }
     }
 }
