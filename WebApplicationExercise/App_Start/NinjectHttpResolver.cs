@@ -22,11 +22,12 @@ namespace WebApplicationExercise.Utils
     /// </summary>
     public class NinjectHttpResolver : IDependencyResolver, IDependencyScope
     {
-        public IKernel Kernel { get; private set; }
         public NinjectHttpResolver(params NinjectModule[] modules)
         {
             Kernel = new StandardKernel(modules);
         }
+
+        public IKernel Kernel { get; private set; }
 
         public NinjectHttpResolver(Assembly assembly)
         {
