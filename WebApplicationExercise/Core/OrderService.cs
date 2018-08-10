@@ -36,10 +36,14 @@ namespace WebApplicationExercise.Core
             return _mapper.Map<List<OrderViewModel>>(result);
         }
 
-        public async Task<OrderViewModel> GetByIdAsync(int orderId)
+        public async Task<OrderViewModel> GetByIdAsync(int orderId, string currency = null)
         {
             _logger.Info($"Get order by Id - {orderId}");
             var order = await _repository.GetWithProductsAsync(orderId);
+
+            if(!string.IsNullOrEmpty(currency))
+                order = await _currencyService.ConvertOrderAsync(order, currency);
+
             return _mapper.Map<OrderViewModel>(order);
         }
 
@@ -87,7 +91,7 @@ namespace WebApplicationExercise.Core
                 .ToListAsync();
 
             if(!string.IsNullOrEmpty(currency))
-                result = await _currencyService.ConvertAsync(result, currency);
+                result = await _currencyService.ConvertOrdersAsync(result, currency);
 
             _logger.Info($"Total taken orders {result.Count}");
 

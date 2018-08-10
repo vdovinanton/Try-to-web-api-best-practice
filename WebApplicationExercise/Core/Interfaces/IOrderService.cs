@@ -20,7 +20,7 @@ namespace WebApplicationExercise.Core.Interfaces
         /// Get by <see cref="int"/> Id
         /// </summary>
         /// <param name="orderId">Specific Id</param>
-        Task<OrderViewModel> GetByIdAsync(int orderId);
+        Task<OrderViewModel> GetByIdAsync(int orderId, string currency = null);
 
         /// <summary>
         /// Filter <see cref="IEnumerable{Order}"/> by time rane or/and by <paramref name="customerName"/>

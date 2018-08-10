@@ -17,10 +17,6 @@ namespace WebApplicationExercise.Utils
 
         public string CustomerName => ConfigurationManager.AppSettings["CustomerBanned"];
 
-        /// <summary>
-        /// For example: Solution_folder/Logs
-        /// </summary>
-        public string LogFolderPath => ConfigurationManager.AppSettings["LogFolderPath"];
-        public string LogNameFile => ConfigurationManager.AppSettings["LogNameFile"];
+        public string CurrenctCurrency => ConfigurationManager.AppSettings["CurrentCurrency"];
     }
 }

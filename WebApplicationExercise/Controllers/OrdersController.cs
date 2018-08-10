@@ -29,9 +29,8 @@ namespace WebApplicationExercise.Controllers
         // dont know why second paramether is requred
         public async Task<OrderViewModel> GetOrder(int orderId, string currency = null)
         {
-            //var order = await _orderService.GetByIdAsync(0);
-            //return _mapper.Map<OrderViewModel>(order);
-            return null;
+            var order = await _orderService.GetByIdAsync(orderId, currency);
+            return order;
         }
         
         [HttpPut]
