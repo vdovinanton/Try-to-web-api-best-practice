@@ -32,35 +32,16 @@ namespace WebApplicationExercise.Core
             var currencyKey = $"{_currentCurrency}_{currency}";
             var currencyRate = await GetCurrency(currency);
 
-            foreach (var order in orders)
-            {
-                var replica = await ConvertOrderAsync(order, currency, currencyRate[currencyKey]);
-                order.Products = replica.Products;
-            }
+            foreach (var product in orders.SelectMany(_ => _.Products))
+                    product.Price *= Math.Round(currencyRate[currencyKey], 3);
 
             return orders;
         }
 
-        public async Task<Order> ConvertOrderAsync(Order order, string currency, double currencyRate = 0)
+        public async Task<Order> ConvertOrderAsync(Order order, string currency)
         {
-            if (currencyRate == 0)
-            {
-                var currencyKey = $"{_currentCurrency}_{currency}";
-                var result = await GetCurrency(currency);
-
-                currencyRate = result[currencyKey];
-            }
-
-            foreach (var product in order.Products)
-                product.Price = ConvertPrice(product.Price, currencyRate);
-
-            return order;
-        }
-
-        private double ConvertPrice(double price, double currencyRate)
-        {
-            price *= Math.Round(currencyRate, 3);
-            return price;
+            var result = await ConvertOrdersAsync(new List<Order> { order }, currency);
+            return result.SingleOrDefault();
         }
     }
 }

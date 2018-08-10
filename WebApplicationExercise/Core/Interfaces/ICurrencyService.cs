@@ -8,6 +8,6 @@ namespace WebApplicationExercise.Core.Interfaces
     {
         Task<Dictionary<string, double>> GetCurrency(string currency);
         Task<List<Order>> ConvertOrdersAsync(List<Order> orders, string currency);
-        Task<Order> ConvertOrderAsync(Order order, string currency, double currencyRate = 0);
+        Task<Order> ConvertOrderAsync(Order order, string currency)
     }
 }
