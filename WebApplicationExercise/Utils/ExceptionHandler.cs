@@ -67,7 +67,6 @@ namespace WebApplicationExercise.Utils
                     context.Response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
                 }
 
-                //Logger.Instance.Error(exceptionLogInfo, isCriticalError);
                 Error(exceptionLogInfo, isCriticalError);
             });
         }

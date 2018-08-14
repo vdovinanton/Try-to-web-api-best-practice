@@ -36,15 +36,7 @@ namespace WebApplicationExercise.Controllers
         [HttpPut]
         public async Task<int> UpdateOrCreateOrder([FromBody]OrderViewModel orderViewModel)
         {
-            //var order = _mapper.Map<Order>(orderViewModel);
-            //return await _orderService.UpdateOrCreateOrderAsync(order);
-
             return await _orderService.UpdateOrCreateOrderAsync(orderViewModel);
-
-            //return await Task.Factory.StartNew(() =>
-            //{
-            //    return 0;
-            //});
         }
 
         [HttpGet]

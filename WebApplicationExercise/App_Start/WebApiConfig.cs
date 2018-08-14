@@ -13,7 +13,6 @@ namespace WebApplicationExercise
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
-            //var httpModules = new NinjectHttpModules();
             config.DependencyResolver = new NinjectHttpResolver(NinjectHttpModules.Modules);
             // Web API routes
             config.MapHttpAttributeRoutes();
